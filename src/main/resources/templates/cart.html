@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverGreen | Your Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-black text-white">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex flex-column" href="index.html">
+                <span class="logo-text">Ever<span class="text-accent">Green</span></span>
+            </a>
+            <a href="index.html" class="btn btn-glass-pill btn-sm">Continue Shopping</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h4 class="fw-bold mb-4">Shopping Cart</h4>
+        
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="d-flex flex-column gap-3">
+                    
+                    <div id="full-cart-container" class="d-flex flex-column gap-3">
+                        <!-- Items will be injected here[cite: 2] -->
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+            <!-- sticky-top ensures the summary stays visible as you scroll -->
+            <div class="glass-card p-4 sticky-top" style="top: 100px;">
+                <h5 class="fw-bold mb-4">Order Summary</h5>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">Rs. 0.00</span>
+                </div>
+                <div class="d-flex justify-content-between mb-4">
+                    <h6 class="fw-bold">Total</h6>
+                    <h6 id="summary-total" class="fw-bold text-accent">Rs. 0.00</h6>
+                </div>
+                <!-- <button class="btn btn-glass-pill w-100 py-3 fw-bold">Proceed to Checkout</button> -->
+                 <a href="checkout.html" class="btn btn-glass-pill w-100 py-3 fw-bold">
+                    Proceed to Checkout
+                </a>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- 1. External Library Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Load datafrom localStorage[cite: 2]
+        let cart = JSON.parse(localStorage.getItem('evergreen_cart')) || {};
+
+        function renderFullCart() {
+            const container = document.getElementById('full-cart-container');
+            container.innerHTML = '';
+            let subtotal = 0;
+
+            if (Object.keys(cart).length === 0) {
+                container.innerHTML = '<div class="text-center p-5"><p>Your cart is empty</p></div>';
+                return;
+            }
+
+            Object.keys(cart).forEach(name => {
+                const item = cart[name];
+                const itemTotal = item.price * item.qty;
+                subtotal += itemTotal;
+
+                container.innerHTML += `
+                    <div class="glass-card p-3 mb-3 cart-item">
+                        <div class="d-flex align-items-center gap-4">
+                            <img src="${item.img}" class="rounded-3" style="width: 80px; height: 80px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1">${name}</h6>
+                                <div class="quantity-control d-flex align-items-center gap-2">
+                                    <button class="btn btn-sm btn-outline-light rounded-circle p-0" onclick="updateQty('${name}', -1)" style="width: 24px; height: 24px;"><i class="bi bi-dash"></i></button>
+                                    <span class="small px-1 qty-value">${item.qty}</span>
+                                    <button class="btn btn-sm btn-outline-light rounded-circle p-0" onclick="updateQty('${name}', 1)" style="width: 24px; height: 24px;"><i class="bi bi-plus"></i></button>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <h6 class="fw-bold mb-1 text-accent">Rs. ${itemTotal.toFixed(2)}</h6>
+                                <button class="btn btn-link btn-sm text-danger p-0 opacity-75" onclick="removeItem('${name}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            // Update Summary totals[cite: 2]
+            document.getElementById('summary-subtotal').innerText = `Rs. ${subtotal.toFixed(2)}`;
+            document.getElementById('summary-total').innerText = `Rs. ${subtotal.toFixed(2)}`;
+        }
+
+        function updateQty(name, delta) {
+            if (cart[name]) {
+                cart[name].qty += delta;
+                if (cart[name].qty <= 0) delete cart[name];
+                saveAndRefresh();
+            }
+        }
+
+        function removeItem(name) {
+            delete cart[name];
+            saveAndRefresh();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('evergreen_cart', JSON.stringify(cart));
+            renderFullCart();
+        }
+
+        // Initialize on page load[cite: 2]
+        window.onload = renderFullCart;
+    </script>
+</body>
+</html>
