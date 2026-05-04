@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverGreen | Saved Addresses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-black text-white">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex flex-column" href="index.html">
+                <span class="logo-text">Ever<span style="color: var(--accent);">Green</span></span>
+            </a>
+            <div class="d-flex gap-3">
+                <a href="index.html" class="btn btn-glass-pill btn-sm">Back to Shop</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container profile-container mt-4">
+        <div class="row align-items-start">
+            
+            <!-- Reused Sidebar -->
+            <div class="col-lg-3">
+                <div class="glass-card p-4">
+                    <div class="text-center mb-4">
+                        <div class="profile-avatar-lg mb-3">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1">Nethmi Amasha</h5>
+                        <p class="small opacity-50">University Student</p>
+                    </div>
+
+                    <div class="profile-nav d-flex flex-column gap-2">
+                        <a href="profile.html" class="nav-link-glass"><i class="bi bi-person"></i> Personal Info</a>
+                        <a href="orders.html" class="nav-link-glass"><i class="bi bi-box-seam"></i> Order History</a>
+                        <a href="addresses.html" class="nav-link-glass active"><i class="bi bi-geo-alt"></i> Saved Addresses</a>
+                        <a href="payments.html" class="nav-link-glass"><i class="bi bi-credit-card"></i> Payment Methods</a>
+                        <hr class="luxury-divider">
+                        <a href="login.html" class="nav-link-glass text-danger"><i class="bi bi-box-arrow-left"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0">Saved Addresses</h4>
+                    <button class="btn btn-glass-pill btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                        <i class="bi bi-plus-lg me-2"></i>Add New Address
+                    </button>
+                </div>
+
+                <div class="row g-3">
+                    <!-- Home Address -->
+                    <!-- Address Card with Working Three Dots -->
+<div class="col-md-6">
+    <div class="glass-card p-4 h-100 border-accent-soft">
+        <div class="d-flex justify-content-between mb-3">
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">Home</span>
+            
+            <!-- FIXED DROPDOWN -->
+            <div class="dropdown">
+                <button class="btn btn-link text-white p-0 opacity-50" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-glass border-white-10">
+                    <li>
+                        <a class="dropdown-item small" href="#" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#addAddressModal" 
+                        onclick="setEditMode()">
+                            <i class="bi bi-pencil me-2"></i>Edit
+                        </a>
+                    </li>
+                    <li><a class="dropdown-item small text-danger" href="#"><i class="bi bi-trash me-2"></i>Delete</a></li>
+                </ul>
+            </div>
+        </div>
+        <h6 class="fw-bold">Nethmi Amasha</h6>
+        <p class="small text-white-50 mb-3">No. 123, High Level Road, Colombo 07.</p>
+        <p class="small mb-0"><i class="bi bi-telephone me-2 text-accent"></i>+94 77 123 4567</p>
+    </div>
+</div>
+
+<!-- Modal with Themed Save Button -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0">
+            <div class="modal-header border-bottom border-white-10 p-4">
+                <h5 class="modal-title fw-bold">New Delivery Address</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="addressForm">
+                    <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Address Label</label>
+                            <input type="text" class="form-control glass-input" placeholder="e.g. SLIIT Campus" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Street Address</label>
+                            <textarea class="form-control glass-input" rows="2" placeholder="House No, Street Name" required></textarea>
+                        </div>
+                    <button type="submit" class="btn btn-glass-pill w-100 mt-3 py-2">
+                        Save Address
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+        function setEditMode() {
+        // Change Modal Title
+        document.querySelector('#addAddressModal .modal-title').innerText = 'Edit Address';
+        
+        // Change Button Text
+        document.querySelector('#addAddressModal .btn-glass-pill').innerText = 'Update Address';
+        
+    }
+
+    document.querySelector('[data-bs-target="#addAddressModal"]:not(.dropdown-item)').addEventListener('click', function() {
+        document.querySelector('#addAddressModal .modal-title').innerText = 'New Delivery Address';
+        document.querySelector('#addAddressModal .btn-glass-pill').innerText = 'Save Address';
+    });
+    </script>
+</body>
+</html>
