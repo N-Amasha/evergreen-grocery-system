@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,7 @@
         <div class="auth-card">
             <!-- Brand -->
             <div class="text-center mb-5">
-                <a class="navbar-brand d-flex flex-column align-items-center" href="index.html">
+                <a class="navbar-brand d-flex flex-column align-items-center" th:href="@{/index}">
                     <span class="logo-text">Ever<span style="color: var(--accent);">Green</span></span>
                     <span class="tagline">Your smart grocery store</span>
                 </a>
@@ -23,16 +23,18 @@
             <h2 class="auth-title">Welcome Back</h2>
             <p class="auth-subtitle">Login to access your premium collection</p>
 
-            <form>
+            <form th:action="@{/login}" method="post">
                 <div class="mb-4">
                     <label class="auth-label">Email Address</label>
-                    <input type="email" class="form-control auth-input" placeholder="name@example.com">
+                    <input type="email" class="form-control auth-input" name="email" placeholder="name@example.com">
                 </div>
 
                 <div class="mb-4">
                     <label class="auth-label">Password</label>
-                    <input type="password" class="form-control auth-input" placeholder="••••••••">
+                    <input type="password" class="form-control auth-input" name="password" placeholder="••••••••">
                 </div>
+
+                <p th:if="${error}" style="color: red;" th:text="${error}"></p>
 
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div class="form-check">
@@ -45,7 +47,7 @@
                 <button class="btn btn-evergreen-pill w-100 py-3 mb-4">Sign In</button>
 
                 <p class="text-center small text-white-50">
-                    New to EverGreen? <a href="signup.html" class="text-accent text-decoration-none">Create Account</a>
+                    New to EverGreen? <a th:href="@{/signup}" class="text-accent text-decoration-none">Create Account</a>
                 </p>
             </form>
         </div>

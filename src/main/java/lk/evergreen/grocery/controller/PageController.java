@@ -2,6 +2,8 @@ package lk.evergreen.grocery.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.ui.Model;
+import lk.evergreen.grocery.entity.User;
 
 //According to MVC (Model-View-Controller) pattern
 @Controller
@@ -24,4 +26,23 @@ public class PageController {
     public String adminDashboard() {
         return "admin/admin-dashboard"; // Templates/admin/ folder
     }
+
+    @GetMapping("/signup")
+    public String showSignupPage(Model model) {
+        model.addAttribute("user", new User()); // This creates the "user" object for the form
+        return "signup";
+    }
+
+    @GetMapping("/index")
+    public String showHomePage() {
+        return "index";
+    }
+
+    // Route for the User Profile Page
+    @GetMapping("/profile")
+    public String showProfilePage() {
+        return "profile"; // Looks for profile.html in templates folder
+    }
+
+
 }
