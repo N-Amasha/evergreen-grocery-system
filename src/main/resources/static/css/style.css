@@ -1361,3 +1361,17 @@ form.row {
     background: rgba(255, 255, 255, 0.015);
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
+
+.glass-sidebar-right {
+    position: fixed;
+    top: 0;
+    right: -400px; /* This keeps it hidden off-screen */
+    width: 400px;
+    height: 100vh;
+    transition: right 0.4s ease; /* This creates the sliding effect */
+    z-index: 2000;
+}
+
+.glass-sidebar-right.active {
+    right: 0; /* This slides it into view */
+}

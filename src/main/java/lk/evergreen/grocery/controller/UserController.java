@@ -13,13 +13,5 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @PostMapping
-    public User register(@RequestBody User user) {
-        return service.register(user);
-    }
 
-    @GetMapping
-    public List<User> getUsers() {
-        return service.getAllUsers();
-    }
 }

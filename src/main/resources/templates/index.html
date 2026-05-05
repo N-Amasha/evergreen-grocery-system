@@ -24,12 +24,32 @@
             </div>
 
             <div class="d-flex align-items-center gap-4">
-                <a href="profile.html" class="nav-icon-link d-flex align-items-center">
-                    <i class="bi bi-person-circle fs-4"></i>
-                    <span class="ms-2 d-none d-md-inline">Account</span>
-                </a>
 
-                <div class="position-relative cursor-pointer" onclick="toggleCart()">
+                <!-- AUTHENTICATED USER VIEW -->
+                <div th:if="${session.loggedInUser}" class="dropdown">
+                    <!-- Use 'button' or 'javascript:void(0)' to prevent the URL from changing to /# -->
+                    <a href="javascript:void(0)" class="nav-icon-link d-flex align-items-center dropdown-toggle"
+                       id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-check-fill fs-4 text-accent"></i>
+                        <span class="ms-2 d-none d-md-inline text-accent" th:text="${session.loggedInUser.name}">User</span>
+                    </a>
+                    <!-- Ensure the menu is inside the same div -->
+                    <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item text-white" th:href="@{/profile}">My Profile</a></li>
+                        <li><hr class="dropdown-divider border-secondary"></li>
+                        <li><a class="dropdown-item text-danger" th:href="@{/logout}">Logout</a></li>
+                    </ul>
+                </div>
+
+                <!-- GUEST VIEW -->
+                <div th:unless="${session.loggedInUser}">
+                    <a href="/login" class="nav-icon-link d-flex align-items-center">
+                        <i class="bi bi-person-circle fs-4"></i>
+                        <span class="ms-2 d-none d-md-inline">Login</span>
+                    </a>
+                </div>
+
+                <div class="position-relative cursor-pointer" onclick="toggleCart(); return false;">
                     <i class="bi bi-cart3 fs-4"></i>
                     <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-accent text-black" style="font-size: 0.6rem;">0</span>
                 </div>
@@ -123,7 +143,7 @@
                                     <p class="product-desc">Ripe, creamy, and sourced from organic farms in Mexico.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
                                         <div class="price-tag">
-                                            <span class="currency">$</span>4.50
+                                            <span class="currency">Rs.</span>450.00
                                         </div>
                                         <button class="btn-add-glow" onclick="addToCart('Hass Avocados', '4.50', 'https://images.unsplash.com/photo-1677555024309-19edb4a1d40e?q=80&w=327&auto=format&fit=crop')"><i class="bi bi-plus"></i>
                                         </button>
@@ -147,7 +167,7 @@
                                     <p class="product-desc">24-hour fermented loaf with a crisp crust and airy center.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
                                         <div class="price-tag">
-                                            <span class="currency">$</span>8.00
+                                            <span class="currency">Rs.</span>800.00
                                         </div>
                                         <button class="btn-add-glow" onclick="addToCart('Artisan Sourdough', '8.00', 'https://images.unsplash.com/photo-1597604391235-a7429b4b350c?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')">
                                             <i class="bi bi-plus-lg"></i>
@@ -172,7 +192,7 @@
                                     <p class="product-desc">Antioxidant-rich berries, hand-picked and delivered fresh.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
                                         <div class="price-tag">
-                                            <span class="currency">$</span>6.25
+                                            <span class="currency">Rs.</span>625.50
                                         </div>
                                         <button class="btn-add-glow" onclick="addToCart('Wild Blueberries', '6.25', 'https://images.unsplash.com/photo-1497534446932-c925b458314e?q=80&w=400&auto=format&fit=crop')">
                                             <i class="bi bi-plus-lg"></i>
@@ -197,7 +217,7 @@
                                     <p class="product-desc">Slow-steeped for 18 hours. Smooth, bold, and low acidity.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
                                         <div class="price-tag">
-                                            <span class="currency">$</span>5.50
+                                            <span class="currency">Rs.</span>550.25
                                         </div>
                                         <button class="btn-add-glow" onclick="addToCart('Signature Cold Brew', '5.50', 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=400&auto=format&fit=crop')">
                                             <i class="bi bi-plus-lg"></i>
@@ -241,10 +261,10 @@
 
                                             <div class="d-flex align-items-center gap-3 mt-3">
                                                 <div class="price-tag text-accent">
-                                                    $<span>12.50</span>
+                                                    Rs.<span>120.50</span>
                                                 </div>
                                                 <div class="text-decoration-line-through opacity-50 small">
-                                                    $<span>18.00</span>
+                                                    Rs.<span>180.00</span>
                                                 </div>
                                             </div>
                                             <button class="btn btn-evergreen-pill btn-sm mt-3" onclick="addToCart('Farm Fresh Selection', '12.50', 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=400&auto=format&fit=crop')">Add to Cart</button>
@@ -271,10 +291,10 @@
 
                                             <div class="d-flex align-items-center gap-3 mt-3">
                                                 <div class="price-tag text-accent">
-                                                    $<span>18.00</span>
+                                                    Rs.<span>180.00</span>
                                                 </div>
                                                 <div class="text-decoration-line-through opacity-50 small">
-                                                    $<span>24.50</span>
+                                                    Rs.<span>240.50</span>
                                                 </div>
                                             </div>
                                             <button class="btn btn-evergreen-pill btn-sm mt-3" onclick="addToCart('Raw Manuka Honey', '18.00', 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?q=80&w=400&auto=format&fit=crop')">Add to Cart</button>
@@ -329,7 +349,7 @@
                                     <h3 class="product-title">White Truffle Oil</h3>
                                     <p class="product-desc">Infused with real Italian truffles for an earthy, rich finish.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>24.00</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>24.00</div>
                                         <button class="btn-add-glow" onclick="addToCart('White Truffle Oil', '24.00', 'https://www.thespruceeats.com/thmb/I1j0CcCamviAcc1T4o1bKmiD_S0=/fit-in/1500x1000/filters:no_upscale():max_bytes(150000):strip_icc()/TruffBlackTruffleOil-8524b9c1149e4d4bb48706d914c77ed9.jpg')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -350,7 +370,7 @@
                                     <h3 class="product-title">Pasture-Raised Eggs</h3>
                                     <p class="product-desc">Farm-to-table eggs with deep orange yolks and high protein.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>7.50</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>700.50</div>
                                         <button class="btn-add-glow" onclick="addToCart('Pasture-Raised Eggs', '7.50', 'https://tse1.explicit.bing.net/th/id/OIP.gsDIHzroxf5Z4RhRJgA8MAHaE6?w=511&h=339&rs=1&pid=ImgDetMain&o=7&rm=3')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -371,7 +391,7 @@
                                     <h3 class="product-title">Pink Himalayan Salt</h3>
                                     <p class="product-desc">Hand-mined crystal salt containing 84 essential minerals.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>12.00</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>120.00</div>
                                         <button class="btn-add-glow" onclick="addToCart('Pink Himalayan Salt', '12.00', 'https://images.unsplash.com/photo-1515543904379-3d757afe72e4?q=80&w=400&auto=format&fit=crop')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -392,7 +412,7 @@
                                     <h3 class="product-title">85% Cocoa Dark Bar</h3>
                                     <p class="product-desc">Single-origin beans roasted for a smooth, bitter-sweet profile.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>9.00</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>975.00</div>
                                         <button class="btn-add-glow" onclick="addToCart('85% Cocoa Dark Bar', '9.00', 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=400&auto=format&fit=crop')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -413,7 +433,7 @@
                                     <h3 class="product-title">Wild Atlantic Salmon</h3>
                                     <p class="product-desc">Sustainably sourced, rich in Omega-3. Never frozen.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>32.00</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>320.00</div>
                                         <button class="btn-add-glow" onclick="addToCart('Wild Atlantic Salmon', '32.00', 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=400&auto=format&fit=crop')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -434,7 +454,7 @@
                                     <h3 class="product-title">Unsweetened Almond</h3>
                                     <p class="product-desc">Pure California almonds. No fillers or carrageenan.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>6.50</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>660.50</div>
                                         <button class="btn-add-glow" onclick="addToCart('Unsweetened Almond Milk', '6.50', 'https://tse3.mm.bing.net/th/id/OIP.FUEYzDWa0I-YotxgsGHWWgHaHv?w=585&h=611&rs=1&pid=ImgDetMain&o=7&rm=3')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -455,7 +475,7 @@
                                     <h3 class="product-title">Ceremonial Matcha</h3>
                                     <p class="product-desc">Stone-ground Japanese green tea for focus and energy.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>28.00</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>289.00</div>
                                         <button class="btn-add-glow" onclick="addToCart('Ceremonial Matcha', '28.00', 'https://tse4.mm.bing.net/th/id/OIP.GJCcFjodkbSol7v9qWjVcwAAAA?w=186&h=186&rs=1&pid=ImgDetMain&o=7&rm=3')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -476,7 +496,7 @@
                                     <h3 class="product-title">Heirloom Tomatoes</h3>
                                     <p class="product-desc">Vibrant, vine-ripened tomatoes with exceptional flavor.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>11.00</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>110.00</div>
                                         <button class="btn-add-glow" onclick="addToCart('Heirloom Tomatoes', '11.00', 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -497,7 +517,7 @@
                                     <h3 class="product-title">Bronze-Die Rigatoni</h3>
                                     <p class="product-desc">Slow-dried organic semolina pasta with a rough, sauce-gripping texture.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>9.50</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>977.50</div>
                                         <button class="btn-add-glow" onclick="addToCart('Bronze-Die Rigatoni', '9.50', 'https://img.freepik.com/premium-psd/glossy-foil-pasta-packet-packaging-mockup_47987-11122.jpg?w=1380')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -518,7 +538,7 @@
                                     <h3 class="product-title">Emerald Green Glow</h3>
                                     <p class="product-desc">Cold-pressed kale, cucumber, green apple, and ginger. No added sugar.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>10.00</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>999.00</div>
                                         <button class="btn-add-glow" onclick="addToCart('Emerald Green Glow', '10.00', 'https://images.unsplash.com/photo-1613478223719-2ab802602423?q=80&w=400&auto=format&fit=crop')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -539,7 +559,7 @@
                                     <h3 class="product-title">Aged Truffle Brie</h3>
                                     <p class="product-desc">Creamy, double-cream brie layered with black winter truffle shavings.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>19.50</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>190.50</div>
                                         <button class="btn-add-glow" onclick="addToCart('Aged Truffle Brie', '19.50', 'https://th.bing.com/th/id/R.bba08fe156707d2bc44fb742416c5cd4?rik=drDQCATb6hY1Nw&riu=http%3a%2f%2fcdn.shopify.com%2fs%2ffiles%2f1%2f0227%2f7838%2f0360%2ffiles%2ftruffle_brie_180g.png%3fv%3d1686697591&ehk=GU34PT8g5ehOGCHZ77EJI7v4FjK0upC0NEihPdkfL3o%3d&risl=&pid=ImgRaw&r=0')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -560,7 +580,7 @@
                                     <h3 class="product-title">Roasted Macadamias</h3>
                                     <p class="product-desc">Dry-roasted with a touch of sea salt. Buttery and crunchy.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>14.00</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>145.00</div>
                                         <button class="btn-add-glow" onclick="addToCart('Roasted Macadamias', '14.00', 'https://tse4.mm.bing.net/th/id/OIP.9yQaWtM0VKa6W5qcT9VjSwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -581,7 +601,7 @@
                                     <h3 class="product-title">Heritage Olive Oil</h3>
                                     <p class="product-desc">First-press, cold-extracted oil from centenarian Greek groves.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>38.00</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>380.00</div>
                                         <button class="btn-add-glow" onclick="addToCart('Heritage Olive Oil', '38.00', 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=400&auto=format&fit=crop')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -602,7 +622,7 @@
                                     <h3 class="product-title">Triple-Strained Yogurt</h3>
                                     <p class="product-desc">Ultra-thick, high-protein yogurt made with grass-fed cow's milk.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>8.50</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>800.50</div>
                                         <button class="btn-add-glow" onclick="addToCart('Triple-Strained Yogurt', '8.50', 'https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=400&auto=format&fit=crop')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -623,7 +643,7 @@
                                     <h3 class="product-title">Jumbo Medjool Dates</h3>
                                     <p class="product-desc">Nature's candy. Soft, caramel-like sweetness, pitted for ease.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>15.00</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>150.00</div>
                                         <button class="btn-add-glow" onclick="addToCart('Jumbo Medjool Dates', '15.00', 'https://plus.unsplash.com/premium_photo-1672753749524-7553762bfb0e?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -644,7 +664,7 @@
                                     <h3 class="product-title">Alpine Reserve Sparkle</h3>
                                     <p class="product-desc">Natural carbonation from Alpine springs. Crisp and refreshing.</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="price-tag"><span class="currency">$</span>4.50</div>
+                                        <div class="price-tag"><span class="currency">Rs.</span>400.50</div>
                                         <button class="btn-add-glow" onclick="addToCart('Alpine Reserve Sparkle', '4.50', 'https://images.unsplash.com/photo-1616118132534-381148898bb4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8d2F0ZXIlMjBib3R0bGV8ZW58MHx8MHx8fDA%3D')"><i class="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
@@ -726,73 +746,66 @@
             </div>
         </div>
     </footer>
-<script th:src="@{/script.js}">
-    let cart = {}; // Store items as { "ProductName": { price, qty, img } }
-let totalPrice = 0.00;
 
-function toggleCart() {
-    document.getElementById('side-cart').classList.toggle('active');
-    document.getElementById('cart-overlay').classList.toggle('active');
-}
+    <script>
+        let cart = {};
 
-function addToCart(name, price, img) {
-    const pPrice = parseFloat(price);
-    
-    // If item exists, just increase quantity. If not, create it.
-    if (cart[name]) {
-        cart[name].qty += 1;
-    } else {
-        cart[name] = { price: pPrice, qty: 1, img: img };
-    }
-    
-    updateCartUI();
-    if(!document.getElementById('side-cart').classList.contains('active')) toggleCart();
-}
+        function toggleCart() {
+            const sidebar = document.getElementById('side-cart');
+            const overlay = document.getElementById('cart-overlay');
 
-function changeQty(name, delta) {
-    if (cart[name]) {
-        cart[name].qty += delta;
-        // Remove item if quantity drops to 0
-        if (cart[name].qty <= 0) delete cart[name];
-    }
-    updateCartUI();
-}
+            // This toggles the 'active' class which should be defined in your CSS
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
 
-function updateCartUI() {
-    const container = document.getElementById('side-cart-items');
-    container.innerHTML = '';
-    let newTotal = 0;
-    let count = 0;
+        function addToCart(name, price, image) {
+            if (cart[name]) {
+                cart[name].quantity += 1;
+            } else {
+                cart[name] = {
+                    price: parseFloat(price),
+                    image: image,
+                    quantity: 1
+                };
+            }
+            updateCartUI();
+            // Automatically open cart when adding an item
+            const sidebar = document.getElementById('side-cart');
+            if (!sidebar.classList.contains('active')) {
+                toggleCart();
+            }
+        }
 
-    Object.keys(cart).forEach(name => {
-        const item = cart[name];
-        newTotal += item.price * item.qty;
-        count += item.qty;
+        function updateCartUI() {
+            const cartItemsContainer = document.getElementById('side-cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('side-cart-total');
 
-        container.innerHTML += `
-            <div class="cart-item-luxury d-flex align-items-center gap-3 mb-3 mx-4">
-                <img src="${item.img}" class="cart-item-img">
-                <div class="flex-grow-1">
-                    <h6 class="small fw-bold mb-0 text-white">${name}</h6>
-                    <p class="x-small text-accent mb-2">Rs. ${(item.price * item.qty).toFixed(2)}</p>
-                    
-                    <!-- Quantity Controls -->
-                    <div class="d-flex align-items-center gap-2">
-                        <button onclick="changeQty('${name}', -1)" class="btn-qty">-</button>
-                        <span class="text-white small fw-bold">${item.qty}</span>
-                        <button onclick="changeQty('${name}', 1)" class="btn-qty">+</button>
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
+            let count = 0;
+
+            for (const [name, item] of Object.entries(cart)) {
+                total += item.price * item.quantity;
+                count += item.quantity;
+
+                cartItemsContainer.innerHTML += `
+                    <div class="d-flex align-items-center mb-3 text-white">
+                        <img src="${item.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                        <div class="ms-3 flex-grow-1">
+                            <div class="small fw-bold">${name}</div>
+                            <div class="small text-accent">Rs. ${(item.price).toFixed(2)} x ${item.quantity}</div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        `;
-    });
+                `;
+            }
 
-    totalPrice = newTotal;
-    document.getElementById('side-cart-total').innerText = `Rs. ${totalPrice.toFixed(2)}`;
-    document.getElementById('cart-count').innerText = count;
-
-    localStorage.setItem('evergreen_cart', JSON.stringify(cart));
-}
-</script>
+            cartCount.innerText = count;
+            cartTotal.innerText = `Rs. ${total.toFixed(2)}`;
+        }
+    </script>
+    <!--Bootstrap JS Bundle-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
