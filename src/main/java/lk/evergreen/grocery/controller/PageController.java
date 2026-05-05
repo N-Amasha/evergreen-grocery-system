@@ -38,11 +38,4 @@ public class PageController {
         return "index";
     }
 
-    // Route for the User Profile Page
-    @GetMapping("/profile")
-    public String showProfilePage() {
-        return "profile"; // Looks for profile.html in templates folder
-    }
-
-
 }

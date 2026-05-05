@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,7 +31,6 @@
                         <div class="profile-avatar-lg mb-3">
                             <i class="bi bi-person-circle"></i>
                         </div>
-                        <h5 class="fw-bold mb-1">Nethmi Amasha</h5>
                         <p class="small opacity-50">University Student</p>
                     </div>
                     
@@ -51,36 +49,6 @@
             <div class="col-lg-9">
                 <div class="glass-card p-5">
                     <h2 class="section-headline mb-4">Account Details</h2>
-                    
-                    <form class="row g-4">
-                        <div class="col-md-6">
-                            <label class="auth-label">First Name</label>
-                            <input type="text" class="form-control auth-input" value="Nethmi">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="auth-label">Last Name</label>
-                            <input type="text" class="form-control auth-input" value="Amasha">
-                        </div>
-                        <div class="col-md-12">
-                            <label class="auth-label">Email Address</label>
-                            <input type="email" class="form-control auth-input" value="nethmi.amasha@university.edu" disabled>
-                            <small class="text-white-50">Email cannot be changed.</small>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="auth-label">Phone Number</label>
-                            <input type="tel" class="form-control auth-input" value="+94 7X XXX XXXX">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="auth-label">Location</label>
-                            <select class="form-select auth-input">
-                                <option selected>Colombo</option>
-                                <option>Kandy</option>
-                                <option>Badulla</option>
-                            </select>
-                        </div>
-                        
-                        <div class="col-12 mt-5">
-                            <button class="btn btn-evergreen-pill px-5" onclick="showToast(event)">Save Changes</button>
                         </div>
                     </form>
                 </div>
@@ -144,16 +112,7 @@
         }
     </script>
     <!-- Notification Container -->
-    <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3">
-        <div id="save-toast" class="toast-glass" role="alert">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-check-circle-fill text-accent me-2"></i>
-                <div class="toast-body">
-                    Changes saved successfully!
-                </div>
-                <button type="button" class="btn-close btn-close-white ms-auto me-2" onclick="hideToast()"></button>
-            </div>
-            <div class="toast-progress"></div>
+
         </div>
     </div>
 </body>

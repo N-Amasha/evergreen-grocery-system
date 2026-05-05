@@ -7,7 +7,5 @@ import lk.evergreen.grocery.entity.User;
 import lk.evergreen.grocery.repository.UserRepository;
 
 @Service
-public interface UserService {
-    void saveUser(User user);
-    User authenticate(String email, String password);
+
 }
