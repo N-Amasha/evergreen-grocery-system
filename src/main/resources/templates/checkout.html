@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverGreen | Secure Checkout</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-black text-white">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg border-bottom border-white-10">
+        <div class="container">
+            <a class="navbar-brand d-flex flex-column" href="index.html">
+                <span class="logo-text">Ever<span class="text-accent">Green</span></span>
+            </a>
+            <div class="small text-white-50"><i class="bi bi-lock-fill me-1"></i> Secure Checkout</div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 mb-5">
+        <div class="row g-5">
+            <!-- Left Column: Shipping & Payment -->
+            <div class="col-lg-7">
+                
+                <!-- Section 1: Delivery Address -->
+                <div class="checkout-section mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0">1. Delivery Address</h5>
+                        <a href="addresses.html" class="small text-accent text-decoration-none">Change</a>
+                    </div>
+                    <div class="glass-card p-4 border-accent">
+                        <div class="d-flex gap-3">
+                            <i class="bi bi-geo-alt text-accent"></i>
+                            <div>
+                                <h6 class="mb-1">Home</h6>
+                                <p class="small text-white-50 mb-0">No. 123, Kandy Road, Malabe, Sri Lanka</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Payment Method -->
+                <div class="checkout-section mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0">2. Payment Method</h5>
+                        <a href="payments.html" class="small text-accent text-decoration-none">Change</a>
+                    </div>
+                    <div class="glass-card p-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-credit-card fs-4"></i>
+                                <div>
+                                    <h6 class="mb-0">Visa ending in 4567</h6>
+                                    <p class="x-small text-white-50 mb-0 text-uppercase">Nethmi Amasha</p>
+                                </div>
+                            </div>
+                            <i class="bi bi-check-circle-fill text-accent"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Delivery Preference -->
+                <div class="checkout-section">
+                    <h5 class="fw-bold mb-4">3. Delivery Schedule</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="glass-card p-3 border-white-10 text-center cursor-pointer active-option">
+                                <p class="small fw-bold mb-1">Standard</p>
+                                <p class="x-small text-white-50 mb-0">Today, 5 PM - 8 PM</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="glass-card p-3 border-white-10 text-center opacity-50">
+                                <p class="small fw-bold mb-1">Schedule</p>
+                                <p class="x-small text-white-50 mb-0">Select Date & Time</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Order Summary -->
+            <div class="col-lg-5">
+                <div class="glass-card p-4 sticky-top" style="top: 100px;">
+                    <h5 class="fw-bold mb-4">Order Summary</h5>
+                    
+                    <!-- Simplified Item List -->
+                    <div class="summary-items mb-4" id="checkout-items-list">
+                        <!-- Cart items will be injected here -->
+                    </div>
+
+                    <hr class="border-white-10 mb-4">
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-white-50">Subtotal</span>
+                        <span id="checkout-subtotal">Rs. 0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-white-50">Delivery Fee</span>
+                        <span>Rs. 250.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <h6 class="fw-bold">Total</h6>
+                        <h6 id="checkout-total" class="fw-bold text-accent">Rs. 0.00</h6> 
+                    </div>
+
+                    <button class="btn btn-glass-pill w-100 py-3 fw-bold mb-3" onclick="placeOrder()">
+                        Place Order
+                    </button>
+                    
+                    <p class="x-small text-center text-white-50">
+                        By placing your order, you agree to EverGreen's 
+                        <a href="#" class="text-accent text-decoration-none">Terms of Service</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card border-0 text-center p-5">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle text-accent" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="fw-bold">Order Placed!</h4>
+                <p class="text-white-50 mb-4">Your fresh groceries are on their way to Malabe.</p>
+                <a href="index.html" class="btn btn-glass-pill">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCheckout();
+        });
+
+        function renderCheckout() {
+    // 1. Get the same 'evergreen_cart' used in cart.html
+    const cart = JSON.parse(localStorage.getItem('evergreen_cart')) || {};
+    const itemsList = document.getElementById('checkout-items-list');
+    let subtotal = 0;
+    const deliveryFee = 250;
+
+    itemsList.innerHTML = '';
+
+    // 2. Loop through the keys (the item names)
+    Object.keys(cart).forEach(itemName => {
+        const item = cart[itemName];
+        
+        // Use .qty because that is what cart.html saves
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
+
+        itemsList.innerHTML += `
+            <div class="d-flex justify-content-between small mb-2">
+                <span>${itemName} x ${item.qty}</span>
+                <span>Rs. ${itemTotal.toFixed(2)}</span>
+            </div>
+        `;
+    });
+
+    // 3. Update the summary totals
+    const total = subtotal + deliveryFee;
+
+    document.getElementById('checkout-subtotal').innerText = `Rs. ${subtotal.toFixed(2)}`;
+    document.getElementById('checkout-total').innerText = `Rs. ${total.toFixed(2)}`;
+}
+
+        function placeOrder() {
+    localStorage.removeItem('evergreen_cart'); // Clears the cart for the next shop[cite: 8]
+    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    successModal.show();
+}
+    </script>
+</body>
+</html>

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,8 +31,6 @@
                         <div class="profile-avatar-lg mb-3">
                             <i class="bi bi-person-circle"></i>
                         </div>
-                        <!-- 2. Dynamic Sidebar Name -->
-                        <h5 class="fw-bold mb-1" th:text="${user?.name}">Loading...</h5>
                         <p class="small opacity-50">University Student</p>
                     </div>
                     
@@ -52,28 +49,6 @@
             <div class="col-lg-9">
                 <div class="glass-card p-5">
                     <h2 class="section-headline mb-4">Account Details</h2>
-
-                    <!-- 3. Fixed Form Tag -->
-                    <form th:action="@{/profile/update}" th:object="${user}" method="post">
-                        <!-- 4. CRITICAL: Hidden ID so Spring knows WHO to update -->
-                        <input type="hidden" th:field="*{id}">
-
-                        <div class="col-md-12">
-                            <label class="auth-label">Full Name</label>
-                            <!-- 5. Bind input to 'name' field -->
-                            <input type="text" th:field="*{name}" class="form-control auth-input" id="fullName" readonly>
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="auth-label">Email Address</label>
-                            <!-- 6. Bind email and make it readonly -->
-                            <input type="email" th:field="*{email}" class="form-control auth-input" readonly>
-                            <small class="text-white-50">Email cannot be changed.</small>
-                        </div>
-
-                        <div class="col-12 mt-5">
-                            <!-- 7. Removed onclick so the form actually submits to Java -->
-                            <button type="submit" id="actionBtn" class="btn btn-evergreen-pill px-5">Edit</button>
                         </div>
                     </form>
                 </div>
@@ -112,30 +87,6 @@
         </div>
     </div>
     <script>
-
-        const actionBtn = document.getElementById('actionBtn');
-        const nameInput = document.getElementById('fullName');
-
-        actionBtn.addEventListener('click', function() {
-            if (actionBtn.innerText === 'Edit') {
-                // Switch to Edit Mode
-                nameInput.removeAttribute('readonly');
-                nameInput.focus();
-                actionBtn.innerText = 'Save Changes';
-                actionBtn.type = 'button'; // Keep it as button so it doesn't submit yet
-            } else {
-                // Switch to Save Mode
-                actionBtn.type = 'submit'; // Now it will trigger your @PostMapping
-            }
-        });
-
-        // Optional: Change button back if they haven't typed anything
-        nameInput.addEventListener('input', function() {
-            if (actionBtn.innerText === 'Edit') {
-                actionBtn.innerText = 'Save Changes';
-            }
-        });
-
         function showToast(event) {
             // 1. Prevent the form from refreshing the page
             if (event) event.preventDefault();
@@ -161,12 +112,7 @@
         }
     </script>
     <!-- Notification Container -->
-    <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" th:if="${param.success}">
-        <div id="save-toast" class="toast-glass" role="alert" style="display: block;">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-check-circle-fill text-accent me-2"></i>
-                <div class="toast-body">Changes saved successfully!</div>
-            </div>
+
         </div>
     </div>
 </body>
