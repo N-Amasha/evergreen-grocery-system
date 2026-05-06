@@ -16,6 +16,11 @@
 *   **Payment Integration:** Management of transaction history and secure payment status tracking.
 *   **Admin Dashboard:** Comprehensive tools for managing users, products, and generating performance reports.
 
+## Project Documentation
+For a deep dive into the planning and architecture of EverGreen, please refer to:
+* System Analysis – Includes DFDs, ER Diagrams, and existing system study.  
+* Requirements Specification – Detailed functional/non-functional requirements and user stories.
+
 ## OOP Implementation
 This project serves as a practical application of core **Object-Oriented Programming** principles:
 *   **Encapsulation:** All model attributes (User, Product, Order) are private with public getters/setters to ensure data integrity.
@@ -39,12 +44,9 @@ src/main/resources/
 └── templates/admin  # HTML User Interfaces (User & Admin views)
 ```
 
-- [System Analysis](docs/analysis.md)[cite: 1]
-- [Requirements Specification](docs/requirements.md)[cite: 2]
-
 ## Getting Started
 1.  **Clone the repository:** `git clone https://github.com/N-Amasha/evergreen-grocery-system.git`
 2.  **Database Setup:** Import the provided SQL schema into PHPMyAdmin.
-3.  **Run Application:** Execute `EvergreenApplication.java` via IntelliJ IDEA.
-4.  **Access UI:** Navigate to `http://localhost:8080` in your browser.
+4.  **Dependency Sync:** Reload Maven to install Spring Security and other dependencies.
+5.  **Run Application:** Execute EvergreenApplication.java and access
 
