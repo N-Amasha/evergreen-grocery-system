@@ -39,6 +39,9 @@ src/main/resources/
 └── templates/admin  # HTML User Interfaces (User & Admin views)
 ```
 
+- [System Analysis](docs/analysis.md)[cite: 1]
+- [Requirements Specification](docs/requirements.md)[cite: 2]
+
 ## Getting Started
 1.  **Clone the repository:** `git clone https://github.com/N-Amasha/evergreen-grocery-system.git`
 2.  **Database Setup:** Import the provided SQL schema into PHPMyAdmin.
