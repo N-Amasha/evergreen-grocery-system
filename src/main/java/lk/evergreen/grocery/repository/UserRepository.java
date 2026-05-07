@@ -1,13 +1,11 @@
 package lk.evergreen.grocery.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import lk.evergreen.grocery.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends JpaRepository<User, Long>{
-<<<<<<< Updated upstream
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    // This allows you to find a user by email for login/validation
-=======
->>>>>>> Stashed changes
     User findByEmail(String email);
 }

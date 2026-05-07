@@ -1,11 +1,35 @@
 package lk.evergreen.grocery.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import java.util.List;
 import lk.evergreen.grocery.entity.User;
 import lk.evergreen.grocery.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
+public class UserService {
 
+    @Autowired
+    private UserRepository userRepository;
+
+    public User registerUser(User user) {
+        return userRepository.save(user);
+    }
+
+    public User loginUser(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        if (user != null && user.getPassword().equals(password)) {
+            return user;
+        }
+        return null;
+    }
+
+    public User updateUser(Long id, User updatedUser) {
+        return userRepository.findById(id).map(user -> {
+            user.setName(updatedUser.getName());
+            user.setPhone(updatedUser.getPhone());
+            user.setUniversity(updatedUser.getUniversity());
+            user.setBio(updatedUser.getBio());
+            return userRepository.save(user);
+        }).orElse(null);
+    }
 }

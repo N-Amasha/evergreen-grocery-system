@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>EverGreen | Premium Grocery</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
@@ -26,24 +26,26 @@
             <div class="d-flex align-items-center gap-4">
 
                 <!-- AUTHENTICATED USER VIEW -->
-                <div th:if="${session.loggedInUser}" class="dropdown">
+                <div id="authenticatedView" class="dropdown" style="display: none;">
                     <!-- Use 'button' or 'javascript:void(0)' to prevent the URL from changing to /# -->
                     <a href="javascript:void(0)" class="nav-icon-link d-flex align-items-center dropdown-toggle"
-                       id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person-check-fill fs-4 text-accent"></i>
-                        <span class="ms-2 d-none d-md-inline text-accent" th:text="${session.loggedInUser.name}">User</span>
+                        <!-- 'User' යනු Placeholder එකකි -->
+                        <span id="userNameDisplay" class="ms-2 d-none d-md-inline text-accent">User</span>
                     </a>
                     <!-- Ensure the menu is inside the same div -->
                     <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item text-white" th:href="@{/profile}">My Profile</a></li>
+                        <li><a class="dropdown-item text-white" href="profile.html">My Profile</a></li>
                         <li><hr class="dropdown-divider border-secondary"></li>
-                        <li><a class="dropdown-item text-danger" th:href="@{/logout}">Logout</a></li>
+                        <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="logout()">Logout</a></li>
                     </ul>
                 </div>
 
+
                 <!-- GUEST VIEW -->
-                <div th:unless="${session.loggedInUser}">
-                    <a href="/login" class="nav-icon-link d-flex align-items-center">
+                <div id="guestView" style="display: none;">
+                    <a href="login.html" class="nav-icon-link d-flex align-items-center">
                         <i class="bi bi-person-circle fs-4"></i>
                         <span class="ms-2 d-none d-md-inline">Login</span>
                     </a>
@@ -749,6 +751,38 @@
 
     <script>
         let cart = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const userJson = localStorage.getItem('loggedInUser');
+            const authView = document.getElementById('authenticatedView');
+            const guestView = document.getElementById('guestView');
+            const nameDisplay = document.getElementById('userNameDisplay');
+
+            if (userJson) {
+                const user = JSON.parse(userJson);
+                if (nameDisplay && user && user.name) {
+                    nameDisplay.innerText = user.name;
+                }
+                if (authView) {
+                    authView.style.display = 'block';
+                }
+                if (guestView) {
+                    guestView.style.display = 'none';
+                }
+            } else {
+                if (authView) {
+                    authView.style.display = 'none';
+                }
+                if (guestView) {
+                    guestView.style.display = 'block';
+                }
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html';
+        }
 
         function toggleCart() {
             const sidebar = document.getElementById('side-cart');
