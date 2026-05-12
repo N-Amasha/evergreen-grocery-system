@@ -10,85 +10,86 @@
 </head>
 <body class="auth-page">
 
-    <div class="auth-wrapper">
-        <div class="auth-card">
-            <!-- Brand -->
-            <div class="text-center mb-5">
-                <a class="navbar-brand d-flex flex-column align-items-center" href="index.html">
-                    <span class="logo-text">Ever<span style="color: var(--accent);">Green</span></span>
-                    <span class="tagline">Your smart grocery store</span>
-                </a>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <!-- Brand -->
+        <div class="text-center mb-5">
+            <a class="navbar-brand d-flex flex-column align-items-center" href="index.html">
+                <span class="logo-text">Ever<span style="color: var(--accent);">Green</span></span>
+                <span class="tagline">Your smart grocery store</span>
+            </a>
+        </div>
+
+        <h2 class="auth-title">Welcome Back</h2>
+        <p class="auth-subtitle">Login to access your premium collection</p>
+
+        <form id="loginForm" action="/login" method="post">
+            <div class="mb-4">
+                <label class="auth-label">Email Address</label>
+                <input id="email" type="email" class="form-control auth-input" name="email" placeholder="name@example.com">
             </div>
 
-            <h2 class="auth-title">Welcome Back</h2>
-            <p class="auth-subtitle">Login to access your premium collection</p>
+            <div class="mb-4">
+                <label class="auth-label">Password</label>
+                <input id="password" type="password" class="form-control auth-input" name="password" placeholder="••••••••">
+            </div>
 
-            <form id="loginForm" action="/login" method="post">
-                <div class="mb-4">
-                    <label class="auth-label">Email Address</label>
-                    <input id="email" type="email" class="form-control auth-input" name="email" placeholder="name@example.com">
+            <p style="color: red; display: none;"></p>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input class="form-check-input custom-check" type="checkbox" id="remember">
+                    <label class="form-check-label text-white-50 small" for="remember">Remember me</label>
                 </div>
+                <a href="#" class="forgot-link">Forgot Password?</a>
+            </div>
 
-                <div class="mb-4">
-                    <label class="auth-label">Password</label>
-                    <input id="password" type="password" class="form-control auth-input" name="password" placeholder="••••••••">
-                </div>
+            <button class="btn btn-evergreen-pill w-100 py-3 mb-4">Sign In</button>
 
-                <p style="color: red; display: none;"></p>
-
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="form-check">
-                        <input class="form-check-input custom-check" type="checkbox" id="remember">
-                        <label class="form-check-label text-white-50 small" for="remember">Remember me</label>
-                    </div>
-                    <a href="#" class="forgot-link">Forgot Password?</a>
-                </div>
-
-                <button class="btn btn-evergreen-pill w-100 py-3 mb-4">Sign In</button>
-
-                <p class="text-center small text-white-50">
-                    New to EverGreen? <a href="signup.html" class="text-accent text-decoration-none">Create Account</a>
-                </p>
-            </form>
-        </div>
+            <p class="text-center small text-white-50">
+                New to EverGreen? <a href="signup.html" class="text-accent text-decoration-none">Create Account</a>
+            </p>
+        </form>
     </div>
+</div>
 
-    <script>
-        async function loginUser(event) {
-            event.preventDefault();
+<script>
+    async function loginUser(event) {
+        event.preventDefault();
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
 
-            const loginData = {
-                email: email,
-                password: password
-            };
+        const loginData = {
+            email: email,
+            password: password
+        };
 
-            try {
-                const response = await fetch('http://localhost:8080/api/users/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(loginData)
-                });
+        try {
+            const response = await fetch('http://localhost:8080/api/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(loginData)
+            });
 
-                if (response.ok) {
-                    const user = await response.json(); // Now we receive an object
-                    localStorage.setItem('loggedInUser', JSON.stringify(user)); // Store data in localStorage
-                    alert("Logged in successfully!");
-                    window.location.href = "index.html";
-                } else {
-                    alert("Email address or password is incorrect!");
-                }
-            } catch (error) {
-                alert("Backend error!");
+            if (response.ok) {
+                const user = await response.json();
+                localStorage.setItem('loggedInUser', JSON.stringify(user));
+                const isAdmin = user.role === 'ADMIN';
+                alert(isAdmin ? "Logged in as admin." : "Logged in successfully!");
+                window.location.href = isAdmin ? "admin/admin-dashboard.html" : "index.html";
+            } else {
+                alert("Email address or password is incorrect!");
             }
+        } catch (error) {
+            alert("Backend error!");
         }
+    }
 
-        document.getElementById('loginForm').addEventListener('submit', loginUser);
-    </script>
+    document.getElementById('loginForm').addEventListener('submit', loginUser);
+</script>
 
 </body>
 </html>
