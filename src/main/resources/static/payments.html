@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverGreen | Payment Methods</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-black text-white">
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex flex-column" href="index.html">
+                <span class="logo-text">Ever<span class="text-accent">Green</span></span>
+            </a>
+            <div class="d-flex gap-3">
+                <a href="index.html" class="btn btn-glass-pill btn-sm">Back to Shop</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container profile-container mt-4">
+        <div class="row align-items-start">
+            
+            <!-- Reused Sidebar -->
+            <div class="col-lg-3">
+                <div class="glass-card p-4">
+                    <div class="text-center mb-4">
+                        <div class="profile-avatar-lg mb-3">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1">Nethmi Amasha</h5>
+                        <p class="small opacity-50">University Student</p>
+                    </div>
+
+                    <div class="profile-nav d-flex flex-column gap-2">
+                        <a href="profile.html" class="nav-link-glass"><i class="bi bi-person"></i> Personal Info</a>
+                        <a href="orders.html" class="nav-link-glass"><i class="bi bi-box-seam"></i> Order History</a>
+                        <a href="addresses.html" class="nav-link-glass active"><i class="bi bi-geo-alt"></i> Saved Addresses</a>
+                        <a href="payments.html" class="nav-link-glass"><i class="bi bi-credit-card"></i> Payment Methods</a>
+                        <hr class="luxury-divider">
+                        <a href="login.html" class="nav-link-glass text-danger"><i class="bi bi-box-arrow-left"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0">Payment Methods</h4>
+                    <button class="btn btn-glass-pill btn-sm" data-bs-toggle="modal" data-bs-target="#addCardModal">
+                        <i class="bi bi-plus-lg me-2"></i>Add New Card
+                    </button>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Visa Card Item -->
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 payment-card visa-gradient">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <i class="bi bi-layers-half fs-3"></i> <!-- Placeholder for Visa Logo -->
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-white p-0 opacity-50" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-dark dropdown-glass">
+                                        <li><a class="dropdown-item small text-danger" href="#">Remove Card</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h5 class="mb-1 tracking-widest">**** **** **** 4567</h5>
+                                <p class="small opacity-50 text-uppercase">Nethmi Amasha</p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <div>
+                                    <p class="x-small opacity-50 mb-0">Expiry Date</p>
+                                    <p class="small mb-0">12/28</p>
+                                </div>
+                                <span class="badge bg-white-10 rounded-pill">Primary</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Card Modal -->
+    <div class="modal fade" id="addCardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card border-0">
+                <div class="modal-header border-bottom border-white-10 p-4">
+                    <h5 class="modal-title fw-bold">Add Payment Method</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="paymentForm">
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Cardholder Name</label>
+                            <input type="text" class="form-control glass-input" placeholder="NETHMI AMASHA" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Card Number</label>
+                            <input type="text" class="form-control glass-input" placeholder="0000 0000 0000 0000" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="small text-white-50 mb-2">Expiry Date</label>
+                                <input type="text" class="form-control glass-input" placeholder="MM/YY" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="small text-white-50 mb-2">CVV</label>
+                                <input type="password" class="form-control glass-input" placeholder="***" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-glass-pill w-100 mt-3 py-2">Save Card</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
