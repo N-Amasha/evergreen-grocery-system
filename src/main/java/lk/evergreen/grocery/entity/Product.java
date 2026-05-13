@@ -44,9 +44,9 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
-    private com.new_grocery.new_grocery.entity.PricingMode pricingMode = com.new_grocery.new_grocery.entity.PricingMode.WEIGHT_BASED_KG;
+    private lk.evergreen.grocery.entity.PricingMode pricingMode = lk.evergreen.grocery.entity.PricingMode.WEIGHT_BASED_KG;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
-    private com.new_grocery.new_grocery.entity.Category category;
+    private lk.evergreen.grocery.entity.Category category;
 }
