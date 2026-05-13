@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics | EverGreen Intelligence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body class="auth-page">
+
+    <div class="d-flex">
+        <!-- Reusable Sidebar -->
+        <div class="glass-sidebar-left p-4" style="width: 280px; height: 100vh; border-right: 1px solid rgba(255,255,255,0.1);">
+            <div class="mb-5">
+                <span class="logo-text">Ever<span class="text-accent">Green</span></span>
+            </div>
+            <nav class="nav flex-column gap-2">
+                <a href="admin-dashboard.html" class="nav-link-glass"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                <a href="admin-inventory.html" class="nav-link-glass"><i class="bi bi-box-seam"></i> Inventory</a>
+                <a href="admin-products.html" class="nav-link-glass"><i class="bi bi-journal-plus"></i> Manage Products</a>
+                <a href="admin-orders.html" class="nav-link-glass"><i class="bi bi-cart-check"></i> Orders</a>
+                <a href="admin-customers.html" class="nav-link-glass"><i class="bi bi-people"></i> Customers</a>
+                <a href="admin-logistics.html" class="nav-link-glass active"><i class="bi bi-truck"></i> Logistics</a>
+                <a href="admin-payments.html" class="nav-link-glass"><i class="bi bi-credit-card"></i> Payments</a>
+                <a href="login.html" class="nav-link-glass text-danger mt-5"><i class="bi bi-box-arrow-left"></i> Logout</a>
+            </nav>
+        </div>
+
+        <main class="flex-grow-1 p-5">
+            <header class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 class="section-headline">Fulfillment Engine</h2>
+                    <p class="section-subheadline">Weight verification and route optimization logic</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <div class="glass-card py-2 px-3">
+                        <span class="x-small opacity-50">Active Couriers:</span>
+                        <span class="fw-bold text-accent ms-2">12</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="row g-4">
+                <!-- Left Column: Verification Queue -->
+                <div class="col-lg-8">
+                    <div class="glass-card mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="product-title mb-0">Pending Weight Verification</h4>
+                            <span class="badge border border-accent text-accent">AI Priority</span>
+                        </div>
+                        
+                        <div class="verification-item p-3 mb-3 border border-white-10 rounded-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="x-small opacity-50">Order #EVG-1024</span>
+                                    <h5 class="mb-1">Organic Hass Avocado</h5>
+                                    <p class="x-small mb-0">Customer Goal: 1.50 kg</p>
+                                </div>
+                                <div class="text-end">
+                                    <input type="number" class="form-control auth-input d-inline-block w-auto" placeholder="Enter Scale Weight">
+                                    <button class="btn-evergreen-pill ms-2">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dispatch Table -->
+                    <div class="glass-card">
+                        <h4 class="product-title mb-4">Ready for Dispatch</h4>
+                        <div class="table-responsive">
+                            <table class="table table-dark align-middle">
+                                <thead>
+                                    <tr class="opacity-50 x-small text-uppercase">
+                                        <th>Route ID</th>
+                                        <th>Destinations</th>
+                                        <th>Load (kg)</th>
+                                        <th>Courier</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="fw-bold">R-MAL-01</span></td>
+                                        <td>Malabe, SLIIT Area</td>
+                                        <td>42.5 kg</td>
+                                        <td>Janith S.</td>
+                                        <td><button class="btn-glass-pill py-1">Assign</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: AI Logistics Insights -->
+                <div class="col-lg-4">
+                    <div class="glass-card h-100">
+                        <h4 class="product-title mb-4">Logistics AI</h4>
+                        <div class="mb-4">
+                            <label class="x-small opacity-50 d-block mb-2">Route Efficiency</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar bg-accent" style="width: 88%"></div>
+                                </div>
+                                <span class="fw-bold text-accent">88%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-suggestion-box p-3 rounded-4 bg-white-5 border border-accent-soft mb-4">
+                            <i class="bi bi-magic text-accent mb-2 d-block"></i>
+                            <p class="x-small mb-0"><strong>Smart Batching:</strong> AI suggests merging 3 orders for Kandy (Route 228) to save 12% in fuel costs.</p>
+                        </div>
+
+                        <div class="stats-mini">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="x-small opacity-50">Avg. Delivery Time</span>
+                                <span class="x-small fw-bold">42 mins</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="x-small opacity-50">Fuel Efficiency</span>
+                                <span class="x-small fw-bold">14.2 km/L</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
