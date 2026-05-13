@@ -6,6 +6,13 @@ import lk.evergreen.grocery.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class UserService {
@@ -38,5 +45,36 @@ public class UserService {
             user.setBio(updatedUser.getBio());
             return userRepository.save(user);
         }).orElse(null);
+    }
+
+    private final String UPLOAD_DIR = "src/main/resources/static/uploads/";
+
+    public String saveProfilePhoto(Long id, MultipartFile file) throws IOException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Create directory if it doesn't exist
+        File directory = new File(UPLOAD_DIR);
+        if (!directory.exists()) directory.mkdirs();
+
+        // Save file locally with a unique name
+        String fileName = id + "_" + file.getOriginalFilename();
+        Path path = Paths.get(UPLOAD_DIR + fileName);
+        Files.write(path, file.getBytes());
+
+        // Update user in database
+        String photoUrl = "/uploads/" + fileName;
+        user.setPhotoUrl(photoUrl);
+        userRepository.save(user);
+
+        return photoUrl;
+    }
+
+    public boolean deleteUserById(Long id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

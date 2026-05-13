@@ -37,6 +37,8 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
+    private String photoUrl;
+
     /**
      * Distinguishes customer vs admin after login; exposed in JSON (password is cleared server-side).
      */
