@@ -30,6 +30,11 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/search")
+    public List<Product> search(@RequestParam String q) {
+        return productService.search(q);
+    }
+
     @PostMapping
     public ResponseEntity<Product> create(@RequestBody ProductRequest body) {
         Product saved = productService.create(body);

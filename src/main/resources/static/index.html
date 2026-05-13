@@ -17,9 +17,9 @@
             </a>
 
             <div class="flex-grow-1 mx-lg-5 mx-3">
-                <form class="search-container">
-                    <input class="form-control search-input" type="search" placeholder="Search for groceries..." aria-label="Search">
-                    <i class="bi bi-search search-icon"></i>
+                <form id="search-form" class="search-container" onsubmit="event.preventDefault(); handleSearch();">
+                    <input id="search-input" class="form-control search-input" type="search" placeholder="Search for groceries..." aria-label="Search">
+                    <i class="bi bi-search search-icon" style="cursor: pointer;" onclick="handleSearch()"></i>
                 </form>
             </div>
 
@@ -585,6 +585,26 @@
 
             cartCount.innerText = count;
             cartTotal.innerText = `Rs. ${total.toFixed(2)}`;
+        }
+
+        async function handleSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) {
+                // If empty, show all products
+                fetchProducts();
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/products/search?q=${encodeURIComponent(query)}`);
+                const results = await response.json();
+                renderProducts(results);
+                
+                // Scroll to results
+                document.getElementById('collection-section').scrollIntoView({behavior: 'smooth'});
+            } catch (error) {
+                console.error('Error searching products:', error);
+            }
         }
     </script>
     <!--Bootstrap JS Bundle-->

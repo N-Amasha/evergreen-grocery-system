@@ -32,6 +32,10 @@ public class ProductService {
         return productRepository.findByIdWithCategory(id);
     }
 
+    public List<Product> search(String query) {
+        return productRepository.searchByName(query);
+    }
+
     @Transactional
     public Product create(ProductRequest req) {
         validateRequest(req);
