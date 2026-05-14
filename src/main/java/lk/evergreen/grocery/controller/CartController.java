@@ -70,4 +70,44 @@ public class CartController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateQuantity(@RequestBody Map<String, Object> payload) {
+        Long userId = Long.valueOf(payload.get("userId").toString());
+        Long productId = Long.valueOf(payload.get("productId").toString());
+        Integer quantity = Integer.valueOf(payload.get("quantity").toString());
+
+        Optional<User> userOpt = userRepository.findById(userId);
+        Optional<Product> productOpt = productRepository.findById(productId);
+
+        if (userOpt.isPresent() && productOpt.isPresent()) {
+            Optional<Cart> existingCartItem = cartRepository.findByUserAndProduct(userOpt.get(), productOpt.get());
+            if (existingCartItem.isPresent()) {
+                Cart cartItem = existingCartItem.get();
+                if (quantity <= 0) {
+                    cartRepository.delete(cartItem);
+                    return ResponseEntity.ok(Map.of("message", "Item removed from cart"));
+                }
+                cartItem.setQuantity(quantity);
+                cartRepository.save(cartItem);
+                return ResponseEntity.ok(Map.of("message", "Quantity updated successfully"));
+            }
+        }
+        return ResponseEntity.badRequest().body(Map.of("message", "Cart item not found"));
+    }
+
+    @DeleteMapping("/remove")
+    public ResponseEntity<?> removeFromCart(@RequestParam Long userId, @RequestParam Long productId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        Optional<Product> productOpt = productRepository.findById(productId);
+
+        if (userOpt.isPresent() && productOpt.isPresent()) {
+            Optional<Cart> existingCartItem = cartRepository.findByUserAndProduct(userOpt.get(), productOpt.get());
+            if (existingCartItem.isPresent()) {
+                cartRepository.delete(existingCartItem.get());
+                return ResponseEntity.ok(Map.of("message", "Item removed from cart successfully"));
+            }
+        }
+        return ResponseEntity.badRequest().body(Map.of("message", "Cart item not found"));
+    }
 }
