@@ -441,6 +441,7 @@
             // Fetch categories and products
             fetchCategories();
             fetchProducts();
+            fetchCart();
         });
 
         async function fetchCategories() {
@@ -500,7 +501,7 @@
                                 <p class="product-desc">${p.description || ''}</p>
                                 <div class="d-flex justify-content-between align-items-center mt-3">
                                     <div class="price-tag"><span class="currency">Rs.</span>${p.price.toFixed(2)}</div>
-                                    <button class="btn-add-glow" onclick="addToCart('${p.name}', '${p.price}', '${p.imageUrl}')">
+                                    <button class="btn-add-glow" onclick="addToCart('${p.name}', '${p.price}', '${p.imageUrl}', ${p.id})">
                                         <i class="bi bi-plus-lg"></i>
                                     </button>
                                 </div>
@@ -542,21 +543,89 @@
             overlay.classList.toggle('active');
         }
 
-        function addToCart(name, price, image) {
-            if (cart[name]) {
-                cart[name].quantity += 1;
-            } else {
-                cart[name] = {
-                    price: parseFloat(price),
-                    image: image,
-                    quantity: 1
-                };
+        async function addToCart(name, price, image, productId) {
+            const userJson = localStorage.getItem('loggedInUser');
+            if (!userJson) {
+                alert('Please login to add items to cart');
+                window.location.href = 'login.html';
+                return;
             }
-            updateCartUI();
-            const sidebar = document.getElementById('side-cart');
-            if (!sidebar.classList.contains('active')) {
-                toggleCart();
+
+            if (!productId) {
+                // Fallback for hardcoded items if needed, but ideally all should have IDs
+                console.error('Product ID is missing');
+                return;
             }
+
+            const user = JSON.parse(userJson);
+            try {
+                const response = await fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        productId: productId,
+                        quantity: 1
+                    })
+                });
+
+                if (response.ok) {
+                    fetchCart(); // Refresh cart from server
+                    const sidebar = document.getElementById('side-cart');
+                    if (!sidebar.classList.contains('active')) {
+                        toggleCart();
+                    }
+                } else {
+                    alert('Failed to add item to cart');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+            }
+        }
+
+        async function fetchCart() {
+            const userJson = localStorage.getItem('loggedInUser');
+            if (!userJson) return;
+
+            const user = JSON.parse(userJson);
+            try {
+                const response = await fetch(`/api/cart/user/${user.id}`);
+                const cartItems = await response.json();
+                renderCartUI(cartItems);
+            } catch (error) {
+                console.error('Error fetching cart:', error);
+            }
+        }
+
+        function renderCartUI(cartItems) {
+            const cartItemsContainer = document.getElementById('side-cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('side-cart-total');
+
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
+            let count = 0;
+
+            cartItems.forEach(item => {
+                const itemTotal = item.product.price * item.quantity;
+                total += itemTotal;
+                count += item.quantity;
+
+                cartItemsContainer.innerHTML += `
+                    <div class="d-flex align-items-center mb-3 text-white">
+                        <img src="${item.product.imageUrl || 'https://via.placeholder.com/50x50'}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                        <div class="ms-3 flex-grow-1">
+                            <div class="small fw-bold">${item.product.name}</div>
+                            <div class="small text-accent">Rs. ${(item.product.price).toFixed(2)} x ${item.quantity}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            cartCount.innerText = count;
+            cartTotal.innerText = `Rs. ${total.toFixed(2)}`;
         }
 
         function updateCartUI() {
