@@ -17,6 +17,7 @@ public class UserCard {
     private String expiryDate; // MM/YY
     private String cardType; // Visa, Mastercard, etc.
     private String token; // Mock payment token
+    private boolean isDefault = false;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

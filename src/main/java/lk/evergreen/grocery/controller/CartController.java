@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -109,5 +110,34 @@ public class CartController {
             }
         }
         return ResponseEntity.badRequest().body(Map.of("message", "Cart item not found"));
+    }
+
+    @GetMapping("/summary/{userId}")
+    public ResponseEntity<?> getCartSummary(@PathVariable Long userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            List<Cart> items = cartRepository.findByUser(userOpt.get());
+
+            BigDecimal subtotal = BigDecimal.ZERO;
+            int totalItems = 0;
+            for (Cart item : items) {
+                BigDecimal itemPrice = item.getProduct().getPrice();
+                BigDecimal quantity = new BigDecimal(item.getQuantity());
+                subtotal = subtotal.add(itemPrice.multiply(quantity));
+                totalItems += item.getQuantity();
+            }
+
+            BigDecimal deliveryFee = totalItems > 0 ? new BigDecimal("250.00") : BigDecimal.ZERO;
+            BigDecimal grandTotal = subtotal.add(deliveryFee);
+
+            return ResponseEntity.ok(Map.of(
+                    "itemCount", totalItems,
+                    "subtotal", subtotal,
+                    "deliveryFee", deliveryFee,
+                    "grandTotal", grandTotal,
+                    "items", items
+            ));
+        }
+        return ResponseEntity.notFound().build();
     }
 }

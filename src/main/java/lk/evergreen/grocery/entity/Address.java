@@ -20,6 +20,8 @@ public class Address {
 
     private String phone;
 
+    private boolean isDefault = false;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

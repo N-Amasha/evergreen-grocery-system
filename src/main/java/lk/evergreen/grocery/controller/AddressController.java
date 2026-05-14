@@ -74,4 +74,24 @@ public class AddressController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PutMapping("/set-default/{id}")
+    public ResponseEntity<?> setDefaultAddress(@PathVariable Long id) {
+        Optional<Address> addressOpt = addressRepository.findById(id);
+        if (addressOpt.isPresent()) {
+            Address targetAddress = addressOpt.get();
+            User user = targetAddress.getUser();
+
+            // Clear existing defaults for this user
+            List<Address> allUserAddresses = addressRepository.findByUser(user);
+            allUserAddresses.forEach(a -> a.setDefault(false));
+
+            // Set new default
+            targetAddress.setDefault(true);
+
+            addressRepository.saveAll(allUserAddresses);
+            return ResponseEntity.ok(Map.of("message", "Default address updated", "address", targetAddress));
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

@@ -68,4 +68,24 @@ public class PaymentController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PutMapping("/set-default/{id}")
+    public ResponseEntity<?> setDefaultCard(@PathVariable Long id) {
+        Optional<UserCard> cardOpt = userCardRepository.findById(id);
+        if (cardOpt.isPresent()) {
+            UserCard targetCard = cardOpt.get();
+            User user = targetCard.getUser();
+
+            // Clear existing defaults for this user
+            List<UserCard> allUserCards = userCardRepository.findByUser(user);
+            allUserCards.forEach(c -> c.setDefault(false));
+
+            // Set new default
+            targetCard.setDefault(true);
+
+            userCardRepository.saveAll(allUserCards);
+            return ResponseEntity.ok(Map.of("message", "Default card updated", "card", targetCard));
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
