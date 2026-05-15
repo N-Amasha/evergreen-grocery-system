@@ -28,7 +28,7 @@
                 <div class="checkout-section mb-5">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-bold mb-0">1. Delivery Address</h5>
-                        <a href="javascript:void(0)" onclick="openAddressSelector()" class="small text-accent text-decoration-none">Change</a>
+                        <a id="address-action-link" href="javascript:void(0)" onclick="openAddressSelector()" class="small text-accent text-decoration-none">Change</a>
                     </div>
                     <div id="selected-address-card" class="glass-card p-4 border-accent">
                         <!-- Content Injected -->
@@ -131,7 +131,7 @@
                         <!-- Addresses injected here -->
                     </div>
                     <div class="mt-4 pt-3 border-top border-white-10 text-center">
-                        <a href="addresses.html" class="small text-accent text-decoration-none">+ Manage Addresses</a>
+                        <a href="javascript:void(0)" onclick="openAddModal()" class="small text-accent text-decoration-none">+ Add New Address</a>
                     </div>
                 </div>
             </div>
@@ -158,13 +158,53 @@
         </div>
     </div>
 
+    <!-- Address Entry Modal (New) -->
+    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card border-0">
+                <div class="modal-header border-bottom border-white-10 p-4">
+                    <h5 class="modal-title fw-bold" id="modalTitle">New Delivery Address</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="addressForm">
+                        <input type="hidden" id="addressId">
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Address Label</label>
+                            <input type="text" id="addressLabel" class="form-control glass-input" placeholder="e.g. Home, Office" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Full Name</label>
+                            <input type="text" id="fullName" class="form-control glass-input" placeholder="Receiver's Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Street Address</label>
+                            <textarea id="streetAddress" class="form-control glass-input" rows="2" placeholder="House No, Street Name, City" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Phone Number</label>
+                            <input type="text" id="phone" class="form-control glass-input" placeholder="+94 ..." required>
+                        </div>
+                        <button type="submit" id="saveAddressBtn" class="btn btn-glass-pill w-100 mt-3 py-2">
+                            Save Address
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // ==========================================
+        // 1. COMMON / GLOBAL LOGIC
+        // ==========================================
         let currentUser = null;
         let allAddresses = [];
         let allPayments = [];
         let selectedAddress = null;
         let selectedPayment = null;
+        let addressEntryModal = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             const userJson = localStorage.getItem('loggedInUser');
@@ -174,42 +214,44 @@
             } else {
                 window.location.href = 'login.html';
             }
+            
+            // Initialize Modals & Forms
+            addressEntryModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+            setupAddressForm();
         });
 
         async function fetchCheckoutData() {
             if (!currentUser) return;
 
             try {
-                // 1. Fetch Cart Summary (Backend Calculation & Empty Check)
-                const summaryRes = await fetch(`/api/cart/summary/${currentUser.id}`);
-                const summaryData = await summaryRes.json();
+                // Fetch Core Data
+                const [summaryRes, addrRes, payRes] = await Promise.all([
+                    fetch(`/api/cart/summary/${currentUser.id}`),
+                    fetch(`/api/addresses/user/${currentUser.id}`),
+                    fetch(`/api/payments/user/${currentUser.id}`)
+                ]);
 
+                const summaryData = await summaryRes.json();
                 if (summaryData.itemCount === 0) {
                     alert('Your cart is empty! Redirecting to home...');
                     window.location.href = 'index.html';
                     return;
                 }
 
-                // 2. Fetch Addresses and Payments
-                const [addrRes, payRes] = await Promise.all([
-                    fetch(`/api/addresses/user/${currentUser.id}`),
-                    fetch(`/api/payments/user/${currentUser.id}`)
-                ]);
-
                 allAddresses = await addrRes.json();
                 allPayments = await payRes.json();
 
+                // Initial Render
                 renderCartSummary(summaryData);
                 
-                // 3. Selection Persistence Logic
-                // Priority: Backend Default > LocalStorage > First Item
-                const backendDefaultAddr = allAddresses.find(a => a.default);
-                const backendDefaultPay = allPayments.find(p => p.default);
-                const savedAddrId = localStorage.getItem('checkout_selected_address_id');
-                const savedPayId = localStorage.getItem('checkout_selected_payment_id');
+                // Persistence Logic (Default > LocalStorage > First Item)
+                const initialAddr = allAddresses.find(a => a.default) || 
+                                   allAddresses.find(a => a.id == localStorage.getItem('checkout_selected_address_id')) || 
+                                   allAddresses[0];
 
-                const initialAddr = backendDefaultAddr || allAddresses.find(a => a.id == savedAddrId) || allAddresses[0];
-                const initialPay = backendDefaultPay || allPayments.find(p => p.id == savedPayId) || allPayments[0];
+                const initialPay = allPayments.find(p => p.default) || 
+                                  allPayments.find(p => p.id == localStorage.getItem('checkout_selected_payment_id')) || 
+                                  allPayments[0];
 
                 selectAddressUI(initialAddr);
                 selectPaymentUI(initialPay);
@@ -222,27 +264,38 @@
         function renderCartSummary(data) {
             const itemsList = document.getElementById('checkout-items-list');
             itemsList.innerHTML = '';
-
             data.items.forEach(item => {
-                const itemTotal = item.product.price * item.quantity;
                 itemsList.innerHTML += `
                     <div class="d-flex justify-content-between small mb-2">
                         <span>${item.product.name} x ${item.quantity}</span>
-                        <span>Rs. ${itemTotal.toFixed(2)}</span>
+                        <span>Rs. ${(item.product.price * item.quantity).toFixed(2)}</span>
                     </div>
                 `;
             });
-
             document.getElementById('checkout-subtotal').innerText = `Rs. ${data.subtotal.toFixed(2)}`;
             document.getElementById('checkout-total').innerText = `Rs. ${data.grandTotal.toFixed(2)}`;
         }
 
+        // ==========================================
+        // 2. ADDRESS MANAGEMENT
+        // ==========================================
         function selectAddressUI(address) {
-            if (!address) return;
+            const actionLink = document.getElementById('address-action-link');
+            const container = document.getElementById('selected-address-card');
+
+            if (!address) {
+                selectedAddress = null;
+                actionLink.innerText = 'Add';
+                actionLink.setAttribute('onclick', 'openAddModal()');
+                container.innerHTML = `<div class="d-flex gap-3 align-items-center opacity-50 py-2"><i class="bi bi-geo-alt"></i><p class="small mb-0">No address selected.</p></div>`;
+                return;
+            }
+
             selectedAddress = address;
             localStorage.setItem('checkout_selected_address_id', address.id);
+            actionLink.innerText = 'Change';
+            actionLink.setAttribute('onclick', 'openAddressSelector()');
             
-            const container = document.getElementById('selected-address-card');
             container.innerHTML = `
                 <div class="d-flex gap-3">
                     <i class="bi bi-geo-alt text-accent"></i>
@@ -255,14 +308,82 @@
             `;
         }
 
+        function openAddressSelector() {
+            const list = document.getElementById('address-selection-list');
+            list.innerHTML = '';
+            allAddresses.forEach(addr => {
+                const isActive = selectedAddress && selectedAddress.id === addr.id;
+                list.innerHTML += `
+                    <div class="glass-card p-3 cursor-pointer select-item-card ${isActive ? 'active-selection' : ''}" onclick="selectAddressFromModal(${addr.id})">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div><h6 class="small fw-bold mb-1">${addr.label}</h6><p class="x-small text-white-50 mb-0">${addr.streetAddress}</p></div>
+                            ${isActive ? '<i class="bi bi-check-circle-fill text-accent"></i>' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            new bootstrap.Modal(document.getElementById('addressSelectModal')).show();
+        }
+
+        async function selectAddressFromModal(id) {
+            try {
+                await fetch(`/api/addresses/set-default/${id}`, { method: 'PUT' });
+                selectAddressUI(allAddresses.find(a => a.id === id));
+                bootstrap.Modal.getInstance(document.getElementById('addressSelectModal')).hide();
+            } catch (err) { console.error(err); }
+        }
+
+        function openAddModal() {
+            const selectionModal = bootstrap.Modal.getInstance(document.getElementById('addressSelectModal'));
+            if (selectionModal) selectionModal.hide();
+            document.getElementById('addressForm').reset();
+            document.getElementById('addressId').value = '';
+            document.getElementById('modalTitle').innerText = 'New Delivery Address';
+            addressEntryModal.show();
+        }
+
+        function setupAddressForm() {
+            document.getElementById('addressForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const id = document.getElementById('addressId').value;
+                const data = {
+                    userId: currentUser.id,
+                    label: document.getElementById('addressLabel').value,
+                    fullName: document.getElementById('fullName').value,
+                    streetAddress: document.getElementById('streetAddress').value,
+                    phone: document.getElementById('phone').value
+                };
+
+                try {
+                    const response = await fetch(id ? `/api/addresses/update/${id}` : '/api/addresses/add', {
+                        method: id ? 'PUT' : 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (response.ok) {
+                        addressEntryModal.hide();
+                        const updatedAddrRes = await fetch(`/api/addresses/user/${currentUser.id}`);
+                        allAddresses = await updatedAddrRes.json();
+                        
+                        const newAddr = !id ? allAddresses[allAddresses.length - 1] : allAddresses.find(a => a.id == id);
+                        selectAddressUI(newAddr);
+                        if (!id) await fetch(`/api/addresses/set-default/${newAddr.id}`, { method: 'PUT' });
+                    }
+                } catch (error) { console.error('Error saving address:', error); }
+            });
+        }
+
+        // ==========================================
+        // 3. PAYMENT MANAGEMENT
+        // ==========================================
         function selectPaymentUI(payment) {
             if (!payment) return;
             selectedPayment = payment;
             localStorage.setItem('checkout_selected_payment_id', payment.id);
 
-            const container = document.getElementById('selected-payment-card');
             const iconClass = payment.cardType === 'Visa' ? 'bi-layers-half' : 'bi-credit-card';
-            container.innerHTML = `
+            document.getElementById('selected-payment-card').innerHTML = `
                 <div class="d-flex align-items-center justify-content-between w-100">
                     <div class="d-flex align-items-center gap-3">
                         <i class="bi ${iconClass} fs-4"></i>
@@ -276,27 +397,6 @@
             `;
         }
 
-        function openAddressSelector() {
-            const list = document.getElementById('address-selection-list');
-            list.innerHTML = '';
-            allAddresses.forEach(addr => {
-                const isActive = selectedAddress && selectedAddress.id === addr.id;
-                list.innerHTML += `
-                    <div class="glass-card p-3 cursor-pointer select-item-card ${isActive ? 'active-selection' : ''}" 
-                         onclick="selectAddressFromModal(${addr.id})">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="small fw-bold mb-1">${addr.label}</h6>
-                                <p class="x-small text-white-50 mb-0">${addr.streetAddress}</p>
-                            </div>
-                            ${isActive ? '<i class="bi bi-check-circle-fill text-accent"></i>' : ''}
-                        </div>
-                    </div>
-                `;
-            });
-            new bootstrap.Modal(document.getElementById('addressSelectModal')).show();
-        }
-
         function openPaymentSelector() {
             const list = document.getElementById('payment-selection-list');
             list.innerHTML = '';
@@ -304,15 +404,11 @@
                 const isActive = selectedPayment && selectedPayment.id === pay.id;
                 const iconClass = pay.cardType === 'Visa' ? 'bi-layers-half' : 'bi-credit-card';
                 list.innerHTML += `
-                    <div class="glass-card p-3 cursor-pointer select-item-card ${isActive ? 'active-selection' : ''}" 
-                         onclick="selectPaymentFromModal(${pay.id})">
+                    <div class="glass-card p-3 cursor-pointer select-item-card ${isActive ? 'active-selection' : ''}" onclick="selectPaymentFromModal(${pay.id})">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center gap-3">
                                 <i class="bi ${iconClass}"></i>
-                                <div>
-                                    <h6 class="small fw-bold mb-1">${pay.cardType} **** ${pay.maskedCardNumber.slice(-4)}</h6>
-                                    <p class="x-small text-white-50 mb-0 text-uppercase">${pay.cardHolderName}</p>
-                                </div>
+                                <div><h6 class="small fw-bold mb-1">${pay.cardType} **** ${pay.maskedCardNumber.slice(-4)}</h6><p class="x-small text-white-50 mb-0 text-uppercase">${pay.cardHolderName}</p></div>
                             </div>
                             ${isActive ? '<i class="bi bi-check-circle-fill text-accent"></i>' : ''}
                         </div>
@@ -322,37 +418,23 @@
             new bootstrap.Modal(document.getElementById('paymentSelectModal')).show();
         }
 
-        async function selectAddressFromModal(id) {
-            try {
-                // 1. Sync with Backend (Persistence)
-                await fetch(`/api/addresses/set-default/${id}`, { method: 'PUT' });
-                
-                // 2. Update UI
-                const addr = allAddresses.find(a => a.id === id);
-                selectAddressUI(addr);
-                bootstrap.Modal.getInstance(document.getElementById('addressSelectModal')).hide();
-            } catch (err) { console.error(err); }
-        }
-
         async function selectPaymentFromModal(id) {
             try {
-                // 1. Sync with Backend (Persistence)
                 await fetch(`/api/payments/set-default/${id}`, { method: 'PUT' });
-
-                // 2. Update UI
-                const pay = allPayments.find(p => p.id === id);
-                selectPaymentUI(pay);
+                selectPaymentUI(allPayments.find(p => p.id === id));
                 bootstrap.Modal.getInstance(document.getElementById('paymentSelectModal')).hide();
             } catch (err) { console.error(err); }
         }
 
+        // ==========================================
+        // 4. ORDER PLACEMENT
+        // ==========================================
         async function placeOrder() {
             if (!selectedAddress || !selectedPayment) {
                 alert('Please select a delivery address and payment method');
                 return;
             }
-            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-            successModal.show();
+            new bootstrap.Modal(document.getElementById('successModal')).show();
         }
     </script>
     
