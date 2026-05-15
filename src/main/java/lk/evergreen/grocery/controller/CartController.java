@@ -1,143 +1,66 @@
 package lk.evergreen.grocery.controller;
 
-import lk.evergreen.grocery.entity.Cart;
-import lk.evergreen.grocery.entity.Product;
-import lk.evergreen.grocery.entity.User;
-import lk.evergreen.grocery.repository.CartRepository;
-import lk.evergreen.grocery.repository.ProductRepository;
-import lk.evergreen.grocery.repository.UserRepository;
+import lk.evergreen.grocery.dto.CartDTO;
+import lk.evergreen.grocery.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
 
     @Autowired
-    private CartRepository cartRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
+    private CartService cartService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addToCart(@RequestBody Map<String, Object> payload) {
-        Long userId = Long.valueOf(payload.get("userId").toString());
-        Long productId = Long.valueOf(payload.get("productId").toString());
-        Integer quantity = Integer.valueOf(payload.get("quantity").toString());
-
-        Optional<User> userOpt = userRepository.findById(userId);
-        Optional<Product> productOpt = productRepository.findById(productId);
-
-        if (userOpt.isPresent() && productOpt.isPresent()) {
-            User user = userOpt.get();
-            Product product = productOpt.get();
-
-            // Check if item already in cart
-            Optional<Cart> existingCartItem = cartRepository.findByUserAndProduct(user, product);
-            Cart cartItem;
-
-            if (existingCartItem.isPresent()) {
-                cartItem = existingCartItem.get();
-                cartItem.setQuantity(cartItem.getQuantity() + quantity);
-            } else {
-                cartItem = new Cart();
-                cartItem.setUser(user);
-                cartItem.setProduct(product);
-                cartItem.setQuantity(quantity);
-            }
-
-            cartRepository.save(cartItem);
+    public ResponseEntity<?> addToCart(@RequestBody CartDTO.Request request) {
+        try {
+            cartService.addToCart(request);
             return ResponseEntity.ok(Map.of("message", "Item added to cart successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
-
-        return ResponseEntity.badRequest().body(Map.of("message", "User or Product not found"));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Cart>> getUserCart(@PathVariable Long userId) {
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isPresent()) {
-            List<Cart> cartItems = cartRepository.findByUser(userOpt.get());
-            return ResponseEntity.ok(cartItems);
+    public ResponseEntity<List<CartDTO.Item>> getUserCart(@PathVariable Long userId) {
+        try {
+            return ResponseEntity.ok(cartService.getUserCart(userId));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateQuantity(@RequestBody Map<String, Object> payload) {
-        Long userId = Long.valueOf(payload.get("userId").toString());
-        Long productId = Long.valueOf(payload.get("productId").toString());
-        Integer quantity = Integer.valueOf(payload.get("quantity").toString());
-
-        Optional<User> userOpt = userRepository.findById(userId);
-        Optional<Product> productOpt = productRepository.findById(productId);
-
-        if (userOpt.isPresent() && productOpt.isPresent()) {
-            Optional<Cart> existingCartItem = cartRepository.findByUserAndProduct(userOpt.get(), productOpt.get());
-            if (existingCartItem.isPresent()) {
-                Cart cartItem = existingCartItem.get();
-                if (quantity <= 0) {
-                    cartRepository.delete(cartItem);
-                    return ResponseEntity.ok(Map.of("message", "Item removed from cart"));
-                }
-                cartItem.setQuantity(quantity);
-                cartRepository.save(cartItem);
-                return ResponseEntity.ok(Map.of("message", "Quantity updated successfully"));
-            }
+    public ResponseEntity<?> updateQuantity(@RequestBody CartDTO.Request request) {
+        try {
+            cartService.updateQuantity(request);
+            return ResponseEntity.ok(Map.of("message", "Quantity updated successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
-        return ResponseEntity.badRequest().body(Map.of("message", "Cart item not found"));
     }
 
     @DeleteMapping("/remove")
     public ResponseEntity<?> removeFromCart(@RequestParam Long userId, @RequestParam Long productId) {
-        Optional<User> userOpt = userRepository.findById(userId);
-        Optional<Product> productOpt = productRepository.findById(productId);
-
-        if (userOpt.isPresent() && productOpt.isPresent()) {
-            Optional<Cart> existingCartItem = cartRepository.findByUserAndProduct(userOpt.get(), productOpt.get());
-            if (existingCartItem.isPresent()) {
-                cartRepository.delete(existingCartItem.get());
-                return ResponseEntity.ok(Map.of("message", "Item removed from cart successfully"));
-            }
+        try {
+            cartService.removeFromCart(userId, productId);
+            return ResponseEntity.ok(Map.of("message", "Item removed from cart successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
-        return ResponseEntity.badRequest().body(Map.of("message", "Cart item not found"));
     }
 
     @GetMapping("/summary/{userId}")
     public ResponseEntity<?> getCartSummary(@PathVariable Long userId) {
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isPresent()) {
-            List<Cart> items = cartRepository.findByUser(userOpt.get());
-
-            BigDecimal subtotal = BigDecimal.ZERO;
-            int totalItems = 0;
-            for (Cart item : items) {
-                BigDecimal itemPrice = item.getProduct().getPrice();
-                BigDecimal quantity = new BigDecimal(item.getQuantity());
-                subtotal = subtotal.add(itemPrice.multiply(quantity));
-                totalItems += item.getQuantity();
-            }
-
-            BigDecimal deliveryFee = totalItems > 0 ? new BigDecimal("250.00") : BigDecimal.ZERO;
-            BigDecimal grandTotal = subtotal.add(deliveryFee);
-
-            return ResponseEntity.ok(Map.of(
-                    "itemCount", totalItems,
-                    "subtotal", subtotal,
-                    "deliveryFee", deliveryFee,
-                    "grandTotal", grandTotal,
-                    "items", items
-            ));
+        try {
+            return ResponseEntity.ok(cartService.getCartSummary(userId));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 }
