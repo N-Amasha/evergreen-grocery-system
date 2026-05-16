@@ -23,4 +23,13 @@ public class OrderController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getOrdersByUser(@PathVariable Long userId) {
+        try {
+            return ResponseEntity.ok(orderService.getOrdersByUser(userId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

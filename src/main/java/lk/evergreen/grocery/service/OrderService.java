@@ -85,4 +85,10 @@ public class OrderService {
             orderRepository.save(order);
         }
     }
+
+    public List<Order> getOrdersByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return orderRepository.findByUserOrderByOrderDateDesc(user);
+    }
 }
