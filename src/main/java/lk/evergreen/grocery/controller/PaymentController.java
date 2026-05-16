@@ -1,8 +1,6 @@
 package lk.evergreen.grocery.controller;
 
 import lk.evergreen.grocery.entity.User;
-import lk.evergreen.grocery.entity.UserCard;
-import lk.evergreen.grocery.repository.UserCardRepository;
 import lk.evergreen.grocery.repository.UserRepository;
 import lk.evergreen.grocery.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
