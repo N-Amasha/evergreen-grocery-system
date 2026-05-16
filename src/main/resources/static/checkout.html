@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/css/style.css">
+    <!-- Stripe JS SDK -->
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
+
 <body class="bg-black text-white">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg border-bottom border-white-10">
@@ -23,12 +27,13 @@
         <div class="row g-5">
             <!-- Left Column: Shipping & Payment -->
             <div class="col-lg-7">
-                
+
                 <!-- Section 1: Delivery Address -->
                 <div class="checkout-section mb-5">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-bold mb-0">1. Delivery Address</h5>
-                        <a id="address-action-link" href="javascript:void(0)" onclick="openAddressSelector()" class="small text-accent text-decoration-none">Change</a>
+                        <a id="address-action-link" href="javascript:void(0)" onclick="openAddressSelector()"
+                            class="small text-accent text-decoration-none">Change</a>
                     </div>
                     <div id="selected-address-card" class="glass-card p-4 border-accent">
                         <!-- Content Injected -->
@@ -39,10 +44,20 @@
                 <div class="checkout-section mb-5">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-bold mb-0">2. Payment Method</h5>
-                        <a href="javascript:void(0)" onclick="openPaymentSelector()" class="small text-accent text-decoration-none">Change</a>
                     </div>
-                    <div id="selected-payment-card" class="glass-card p-4">
-                        <!-- Content Injected -->
+                    <div id="stripe-payment-container" class="glass-card p-4 border-white-10">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <i class="bi bi-credit-card text-accent fs-4"></i>
+                            <h6 class="mb-0">Credit or Debit Card</h6>
+                        </div>
+
+                        <!-- Stripe Card Element Mount Point -->
+                        <div id="card-element" class="form-control glass-input py-3">
+                            <!-- A Stripe Element will be inserted here. -->
+                        </div>
+
+                        <!-- Used to display form errors. -->
+                        <div id="card-errors" role="alert" class="text-danger small mt-2"></div>
                     </div>
                 </div>
 
@@ -70,14 +85,14 @@
             <div class="col-lg-5">
                 <div class="glass-card p-4 sticky-top" style="top: 100px;">
                     <h5 class="fw-bold mb-4">Order Summary</h5>
-                    
+
                     <!-- Simplified Item List -->
                     <div class="summary-items mb-4" id="checkout-items-list">
                         <!-- Cart items will be injected here -->
                     </div>
 
                     <hr class="border-white-10 mb-4">
-                    
+
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-white-50">Subtotal</span>
                         <span id="checkout-subtotal">Rs. 0.00</span>
@@ -88,15 +103,15 @@
                     </div>
                     <div class="d-flex justify-content-between mb-4">
                         <h6 class="fw-bold">Total</h6>
-                        <h6 id="checkout-total" class="fw-bold text-accent">Rs. 0.00</h6> 
+                        <h6 id="checkout-total" class="fw-bold text-accent">Rs. 0.00</h6>
                     </div>
 
                     <button class="btn btn-glass-pill w-100 py-3 fw-bold mb-3" onclick="placeOrder()">
                         Place Order
                     </button>
-                    
+
                     <p class="x-small text-center text-white-50">
-                        By placing your order, you agree to EverGreen's 
+                        By placing your order, you agree to EverGreen's
                         <a href="#" class="text-accent text-decoration-none">Terms of Service</a>.
                     </p>
                 </div>
@@ -131,7 +146,8 @@
                         <!-- Addresses injected here -->
                     </div>
                     <div class="mt-4 pt-3 border-top border-white-10 text-center">
-                        <a href="javascript:void(0)" onclick="openAddModal()" class="small text-accent text-decoration-none">+ Add New Address</a>
+                        <a href="javascript:void(0)" onclick="openAddModal()"
+                            class="small text-accent text-decoration-none">+ Add New Address</a>
                     </div>
                 </div>
             </div>
@@ -171,19 +187,23 @@
                         <input type="hidden" id="addressId">
                         <div class="mb-3">
                             <label class="small text-white-50 mb-2">Address Label</label>
-                            <input type="text" id="addressLabel" class="form-control glass-input" placeholder="e.g. Home, Office" required>
+                            <input type="text" id="addressLabel" class="form-control glass-input"
+                                placeholder="e.g. Home, Office" required>
                         </div>
                         <div class="mb-3">
                             <label class="small text-white-50 mb-2">Full Name</label>
-                            <input type="text" id="fullName" class="form-control glass-input" placeholder="Receiver's Name" required>
+                            <input type="text" id="fullName" class="form-control glass-input"
+                                placeholder="Receiver's Name" required>
                         </div>
                         <div class="mb-3">
                             <label class="small text-white-50 mb-2">Street Address</label>
-                            <textarea id="streetAddress" class="form-control glass-input" rows="2" placeholder="House No, Street Name, City" required></textarea>
+                            <textarea id="streetAddress" class="form-control glass-input" rows="2"
+                                placeholder="House No, Street Name, City" required></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="small text-white-50 mb-2">Phone Number</label>
-                            <input type="text" id="phone" class="form-control glass-input" placeholder="+94 ..." required>
+                            <input type="text" id="phone" class="form-control glass-input" placeholder="+94 ..."
+                                required>
                         </div>
                         <button type="submit" id="saveAddressBtn" class="btn btn-glass-pill w-100 mt-3 py-2">
                             Save Address
@@ -214,7 +234,7 @@
             } else {
                 window.location.href = 'login.html';
             }
-            
+
             // Initialize Modals & Forms
             addressEntryModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
             setupAddressForm();
@@ -225,10 +245,9 @@
 
             try {
                 // Fetch Core Data
-                const [summaryRes, addrRes, payRes] = await Promise.all([
+                const [summaryRes, addrRes] = await Promise.all([
                     fetch(`/api/cart/summary/${currentUser.id}`),
-                    fetch(`/api/addresses/user/${currentUser.id}`),
-                    fetch(`/api/payments/user/${currentUser.id}`)
+                    fetch(`/api/addresses/user/${currentUser.id}`)
                 ]);
 
                 const summaryData = await summaryRes.json();
@@ -239,23 +258,17 @@
                 }
 
                 allAddresses = await addrRes.json();
-                allPayments = await payRes.json();
 
                 // Initial Render
                 renderCartSummary(summaryData);
-                
-                // Persistence Logic (Default > LocalStorage > First Item)
-                const initialAddr = allAddresses.find(a => a.default) || 
-                                   allAddresses.find(a => a.id == localStorage.getItem('checkout_selected_address_id')) || 
-                                   allAddresses[0];
 
-                const initialPay = allPayments.find(p => p.default) || 
-                                  allPayments.find(p => p.id == localStorage.getItem('checkout_selected_payment_id')) || 
-                                  allPayments[0];
+                // Persistence Logic (isDefault OR default > LocalStorage > First Item)
+                const initialAddr = allAddresses.find(a => a.isDefault === true || a.default === true) ||
+                    allAddresses.find(a => a.id == localStorage.getItem('checkout_selected_address_id')) ||
+                    allAddresses[0];
 
                 selectAddressUI(initialAddr);
-                selectPaymentUI(initialPay);
-                
+
             } catch (error) {
                 console.error('Error fetching checkout data:', error);
             }
@@ -295,7 +308,7 @@
             localStorage.setItem('checkout_selected_address_id', address.id);
             actionLink.innerText = 'Change';
             actionLink.setAttribute('onclick', 'openAddressSelector()');
-            
+
             container.innerHTML = `
                 <div class="d-flex gap-3">
                     <i class="bi bi-geo-alt text-accent"></i>
@@ -343,7 +356,7 @@
         }
 
         function setupAddressForm() {
-            document.getElementById('addressForm').addEventListener('submit', async function(e) {
+            document.getElementById('addressForm').addEventListener('submit', async function (e) {
                 e.preventDefault();
                 const id = document.getElementById('addressId').value;
                 const data = {
@@ -365,7 +378,7 @@
                         addressEntryModal.hide();
                         const updatedAddrRes = await fetch(`/api/addresses/user/${currentUser.id}`);
                         allAddresses = await updatedAddrRes.json();
-                        
+
                         const newAddr = !id ? allAddresses[allAddresses.length - 1] : allAddresses.find(a => a.id == id);
                         selectAddressUI(newAddr);
                         if (!id) await fetch(`/api/addresses/set-default/${newAddr.id}`, { method: 'PUT' });
@@ -375,83 +388,135 @@
         }
 
         // ==========================================
-        // 3. PAYMENT MANAGEMENT
+        // 3. STRIPE INITIALIZATION
         // ==========================================
-        function selectPaymentUI(payment) {
-            if (!payment) return;
-            selectedPayment = payment;
-            localStorage.setItem('checkout_selected_payment_id', payment.id);
+        const stripe = Stripe('YOUR_STRIPE_PUBLISHABLE_KEY'); // PLACEHOLDER
+        const elements = stripe.elements();
 
-            const iconClass = payment.cardType === 'Visa' ? 'bi-layers-half' : 'bi-credit-card';
-            document.getElementById('selected-payment-card').innerHTML = `
-                <div class="d-flex align-items-center justify-content-between w-100">
-                    <div class="d-flex align-items-center gap-3">
-                        <i class="bi ${iconClass} fs-4"></i>
-                        <div>
-                            <h6 class="mb-0">${payment.cardType} ending in ${payment.maskedCardNumber.slice(-4)}</h6>
-                            <p class="x-small text-white-50 mb-0 text-uppercase">${payment.cardHolderName}</p>
-                        </div>
-                    </div>
-                    <i class="bi bi-check-circle-fill text-accent"></i>
-                </div>
-            `;
-        }
+        // Custom styling for Stripe Element
+        const style = {
+            base: {
+                color: '#fff',
+                fontFamily: '"Inter", sans-serif',
+                fontSmoothing: 'antialiased',
+                fontSize: '16px',
+                '::placeholder': { color: '#aab7c4' }
+            },
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
+            }
+        };
 
-        function openPaymentSelector() {
-            const list = document.getElementById('payment-selection-list');
-            list.innerHTML = '';
-            allPayments.forEach(pay => {
-                const isActive = selectedPayment && selectedPayment.id === pay.id;
-                const iconClass = pay.cardType === 'Visa' ? 'bi-layers-half' : 'bi-credit-card';
-                list.innerHTML += `
-                    <div class="glass-card p-3 cursor-pointer select-item-card ${isActive ? 'active-selection' : ''}" onclick="selectPaymentFromModal(${pay.id})">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="bi ${iconClass}"></i>
-                                <div><h6 class="small fw-bold mb-1">${pay.cardType} **** ${pay.maskedCardNumber.slice(-4)}</h6><p class="x-small text-white-50 mb-0 text-uppercase">${pay.cardHolderName}</p></div>
-                            </div>
-                            ${isActive ? '<i class="bi bi-check-circle-fill text-accent"></i>' : ''}
-                        </div>
-                    </div>
-                `;
-            });
-            new bootstrap.Modal(document.getElementById('paymentSelectModal')).show();
-        }
+        const card = elements.create('card', { style: style });
+        card.mount('#card-element');
 
-        async function selectPaymentFromModal(id) {
-            try {
-                await fetch(`/api/payments/set-default/${id}`, { method: 'PUT' });
-                selectPaymentUI(allPayments.find(p => p.id === id));
-                bootstrap.Modal.getInstance(document.getElementById('paymentSelectModal')).hide();
-            } catch (err) { console.error(err); }
-        }
+        card.on('change', function (event) {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
 
         // ==========================================
         // 4. ORDER PLACEMENT
         // ==========================================
         async function placeOrder() {
-            if (!selectedAddress || !selectedPayment) {
-                alert('Please select a delivery address and payment method');
+            if (!selectedAddress) {
+                alert('Please select a delivery address');
                 return;
             }
-            new bootstrap.Modal(document.getElementById('successModal')).show();
+
+            const placeOrderBtn = document.querySelector('button[onclick="placeOrder()"]');
+            placeOrderBtn.disabled = true;
+            placeOrderBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+            try {
+                // STEP 1: Create Order in Backend
+                const orderResponse = await fetch('/api/orders/place', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: currentUser.id,
+                        addressId: selectedAddress.id,
+                        paymentMethod: 'STRIPE'
+                    })
+                });
+
+                if (!orderResponse.ok) {
+                    throw new Error(await orderResponse.text());
+                }
+
+                const orderData = await orderResponse.json();
+                const amountInCents = Math.round(orderData.totalAmount * 100);
+
+                // STEP 2: Create Payment Intent
+                const intentResponse = await fetch('/api/payments/create-payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: orderData.id,
+                        amount: amountInCents,
+                        currency: 'lkr'
+                    })
+                });
+
+                const intentData = await intentResponse.json();
+
+                // STEP 3: Confirm Payment with Stripe
+                const result = await stripe.confirmCardPayment(intentData.clientSecret, {
+                    payment_method: {
+                        card: card,
+                        billing_details: {
+                            name: selectedAddress.fullName,
+                            phone: selectedAddress.phone
+                        }
+                    }
+                });
+
+                if (result.error) {
+                    // Show error to customer
+                    document.getElementById('card-errors').textContent = result.error.message;
+                    placeOrderBtn.disabled = false;
+                    placeOrderBtn.innerText = 'Place Order';
+                } else {
+                    // The payment has been processed!
+                    if (result.paymentIntent.status === 'succeeded') {
+                        new bootstrap.Modal(document.getElementById('successModal')).show();
+                    }
+                }
+
+            } catch (error) {
+                console.error('Order placement failed:', error);
+                alert('Failed to place order: ' + error.message);
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.innerText = 'Place Order';
+            }
         }
     </script>
-    
+
     <style>
         .select-item-card {
             transition: 0.2s;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
+
         .select-item-card:hover {
             border-color: var(--accent);
             background: rgba(46, 204, 113, 0.05);
         }
+
         .active-selection {
             border-color: var(--accent) !important;
             background: rgba(46, 204, 113, 0.1) !important;
         }
-        .cursor-pointer { cursor: pointer; }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
     </style>
 </body>
+
 </html>
