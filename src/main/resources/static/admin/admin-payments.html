@@ -6,7 +6,7 @@
     <title>Financial Ledger | EverGreen</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="auth-page">
     <div class="d-flex">
@@ -39,13 +39,13 @@
                 <div class="col-md-6">
                     <div class="glass-card">
                         <span class="tagline">Monthly Gross Revenue</span>
-                        <h2 class="product-price text-accent mt-2">Rs. 842,500.00</h2>
+                        <h2 class="product-price text-accent mt-2" id="monthlyRevenueCard">Rs. 0.00</h2>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="glass-card">
                         <span class="tagline">Refunds/Adjustments</span>
-                        <h2 class="product-price text-danger mt-2">Rs. 12,400.00</h2>
+                        <h2 class="product-price text-danger mt-2" id="refundsCard">Rs. 0.00</h2>
                     </div>
                 </div>
             </div>
@@ -63,25 +63,14 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="fw-bold text-accent">#TRX-9921</span></td>
-                            <td>Nethmi Amasha</td>
-                            <td>Rs. 2,450.00</td>
-                            <td>Visa (**** 4242)</td>
-                            <td>04 May, 2026</td>
-                            <td><span class="badge bg-success-soft">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td><span class="fw-bold text-accent">#TRX-9920</span></td>
-                            <td>Janith S.</td>
-                            <td>Rs. 1,200.00</td>
-                            <td>Bank Transfer</td>
-                            <td>03 May, 2026</td>
-                            <td><span class="badge border border-white-10">Verification Pending</span></td>
-                        </tr>
+                    <tbody id="paymentsTableBody">
+                        <!-- Dynamically Loaded -->
                     </tbody>
                 </table>
+            </div>
+        </main>
+    </div>
+
     <script>
         // Client-side Guard: Only allow logged-in Admins to access this panel
         const userJson = localStorage.getItem('loggedInUser');
@@ -94,6 +83,70 @@
                 alert("Access Denied! You do not have administrator privileges.");
                 window.location.href = '../index.html';
             }
+        }
+
+        // Dynamic Financial Ledger Loading
+        document.addEventListener("DOMContentLoaded", () => {
+            loadPaymentLedger();
+        });
+
+        function loadPaymentLedger() {
+            const tbody = document.getElementById("paymentsTableBody");
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4"><span class="spinner-border spinner-border-sm text-accent me-2"></span>Loading ledger transactions...</td></tr>`;
+
+            fetch("/api/admin/payments/ledger")
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to fetch financial ledger");
+                    return res.json();
+                })
+                .then(ledger => {
+                    // Update KPI Cards
+                    document.getElementById("monthlyRevenueCard").innerText = `Rs. ${ledger.monthlyRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    document.getElementById("refundsCard").innerText = `Rs. ${ledger.refunds.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+                    tbody.innerHTML = "";
+                    if (ledger.transactions.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 opacity-50">No ledger transaction history found.</td></tr>`;
+                        return;
+                    }
+
+                    ledger.transactions.forEach(t => {
+                        let badgeClass = "border border-white-10";
+                        let label = "Verification Pending";
+
+                        // Map order status to payment status
+                        if (t.status === "CANCELLED") {
+                            badgeClass = "bg-danger-soft";
+                            label = "Refunded";
+                        } else if (t.status === "DELIVERED" || t.paymentMethod.toLowerCase().includes("card") || t.paymentMethod.toLowerCase().includes("stripe")) {
+                              badgeClass = "bg-success-soft";
+                              label = "Completed";
+                        } else if (t.status === "SHIPPED") {
+                              badgeClass = "bg-info-soft text-info";
+                              label = "In Transit";
+                        }
+
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><span class="fw-bold text-accent">#TRX-${t.id}</span></td>
+                            <td>${escapeHtml(t.customerName)}</td>
+                            <td>Rs. ${t.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td>${escapeHtml(t.paymentMethod)}</td>
+                            <td>${t.orderDate}</td>
+                            <td><span class="badge ${badgeClass}">${label}</span></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(err => {
+                    console.error("Error loading ledger:", err);
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Error: ${err.message}</td></tr>`;
+                });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
     </script>
 </body>
