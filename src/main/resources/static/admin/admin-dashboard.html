@@ -47,29 +47,29 @@
                 <div class="col-md-3">
                     <div class="glass-card">
                         <span class="tagline">Daily Revenue</span>
-                        <h3 class="product-price mt-2"><span class="currency">Rs.</span> 42,500</h3>
-                        <span class="text-accent x-small"><i class="bi bi-graph-up"></i> +12.5%</span>
+                        <h3 class="product-price mt-2"><span class="currency">Rs. </span><span id="dailyRevenue">0.00</span></h3>
+                        <span class="text-accent x-small"><i class="bi bi-graph-up"></i> Live sum</span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="glass-card">
                         <span class="tagline">Active Orders</span>
-                        <h3 class="product-title mt-2">18</h3>
-                        <span class="opacity-50 x-small">4 pending weight verification</span>
+                        <h3 class="product-title mt-2" id="activeOrders">0</h3>
+                        <span class="opacity-50 x-small">Pending, Confirmed, Shipped</span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="glass-card">
                         <span class="tagline">Stock Alerts</span>
-                        <h3 class="product-title mt-2 text-danger">05</h3>
-                        <span class="text-danger x-small"><i class="bi bi-exclamation-triangle"></i> Critical levels</span>
+                        <h3 class="product-title mt-2 text-danger" id="stockAlerts">0</h3>
+                        <span class="text-danger x-small"><i class="bi bi-exclamation-triangle"></i> Items under 20 quantity</span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="glass-card" style="border-color: var(--accent);">
-                        <span class="tagline">AI Efficiency</span>
-                        <h3 class="product-title mt-2">94%</h3>
-                        <span class="text-accent x-small">Waste reduction optimized</span>
+                        <span class="tagline">Active Deliveries</span>
+                        <h3 class="product-title mt-2" id="activeDeliveries">0</h3>
+                        <span class="text-accent x-small">Orders in transit (SHIPPED)</span>
                     </div>
                 </div>
             </div>
@@ -77,38 +77,29 @@
             <!-- Recent Activity Table -->
             <div class="glass-card">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="product-title mb-0">Recent Stock Reconciliation</h4>
-                    <a href="admin-logistics.html" class="view-all-link">View Logistics</a>
+                    <h4 class="product-title mb-0">Recent System Orders</h4>
+                    <a href="admin-orders.html" class="view-all-link">Manage Orders</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-dark align-middle">
                         <thead>
                             <tr class="opacity-50 x-small text-uppercase">
-                                <th>Product</th>
-                                <th>System Qty</th>
-                                <th>Actual Qty (Weight)</th>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Order Date</th>
+                                <th>Total Amount</th>
                                 <th>Status</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td><span class="fw-bold">Organic Avocados</span></td>
-                                <td>45.0 kg</td>
-                                <td>44.2 kg</td>
-                                <td><span class="badge bg-warning text-dark">Variance</span></td>
-                                <td><button class="btn-add-cart"><i class="bi bi-pencil-square"></i></button></td>
-                            </tr>
-                            <tr>
-                                <td><span class="fw-bold">King Coconut</span></td>
-                                <td>120 Units</td>
-                                <td>120 Units</td>
-                                <td><span class="badge bg-accent text-dark">Synced</span></td>
-                                <td><button class="btn-add-cart"><i class="bi bi-pencil-square"></i></button></td>
-                            </tr>
+                        <tbody id="recentOrdersTableBody">
+                            <!-- Dynamically Loaded -->
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </main>
+    </div>
+
     <script>
         // Client-side Guard: Only allow logged-in Admins to access this panel
         const userJson = localStorage.getItem('loggedInUser');
@@ -121,6 +112,66 @@
                 alert("Access Denied! You do not have administrator privileges.");
                 window.location.href = '../index.html';
             }
+        }
+
+        // Dynamic Dashboard Statistics Fetch
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchStats();
+        });
+
+        function fetchStats() {
+            fetch("/api/admin/dashboard")
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to load dashboard statistics");
+                    return res.json();
+                })
+                .then(stats => {
+                    document.getElementById("dailyRevenue").innerText = stats.dailyRevenue.toFixed(2);
+                    document.getElementById("activeOrders").innerText = stats.activeOrdersCount;
+                    document.getElementById("stockAlerts").innerText = stats.lowStockCount;
+                    document.getElementById("activeDeliveries").innerText = stats.activeDeliveriesCount;
+
+                    // Recent Orders Table
+                    const tbody = document.getElementById("recentOrdersTableBody");
+                    tbody.innerHTML = "";
+                    if (stats.recentOrders.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 opacity-50">No recent orders found.</td></tr>`;
+                    } else {
+                        stats.recentOrders.forEach(o => {
+                            const dateStr = new Date(o.orderDate).toLocaleDateString(undefined, {
+                                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                            });
+                            const row = document.createElement("tr");
+                            row.innerHTML = `
+                                <td><span class="fw-bold">#EVG-${o.id}</span></td>
+                                <td>${o.customer ? escapeHtml(o.customer.name) : 'Guest'}</td>
+                                <td>${dateStr}</td>
+                                <td><span class="product-price" style="font-size: 0.95rem;"><span class="currency">Rs.</span> ${o.totalAmount.toFixed(2)}</span></td>
+                                <td><span class="badge ${getStatusBadgeClass(o.status)}">${o.status}</span></td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error("Error loading dashboard stats:", err);
+                });
+        }
+
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'PENDING': return 'bg-warning text-dark';
+                case 'CONFIRMED': return 'bg-info text-dark';
+                case 'SHIPPED': return 'bg-primary text-white';
+                case 'DELIVERED': return 'bg-success text-white';
+                case 'CANCELLED': return 'bg-danger text-white';
+                default: return 'bg-secondary text-white';
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
     </script>
 </body>
