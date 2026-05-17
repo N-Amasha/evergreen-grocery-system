@@ -87,4 +87,12 @@ public class AdminProductService {
         }
         return s.trim();
     }
+
+    @Transactional
+    public Product updateStock(Long id, Integer stock) {
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        p.setStockQuantity(stock);
+        return productRepository.save(p);
+    }
 }

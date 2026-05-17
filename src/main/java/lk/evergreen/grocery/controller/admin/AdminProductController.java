@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/admin/products")
 @CrossOrigin(origins = "*")
@@ -32,5 +34,15 @@ public class AdminProductController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         adminProductService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/stock")
+    public ResponseEntity<Product> updateStock(@PathVariable Long id, @RequestBody Map<String, Integer> body) {
+        Integer stock = body.get("stock");
+        if (stock == null || stock < 0) {
+            return ResponseEntity.badRequest().build();
+        }
+        Product updated = adminProductService.updateStock(id, stock);
+        return ResponseEntity.ok(updated);
     }
 }
