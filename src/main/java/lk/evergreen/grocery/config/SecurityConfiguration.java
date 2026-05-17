@@ -15,7 +15,8 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/**").permitAll()
+                        .requestMatchers("/api/admin/**").permitAll() // Admin endpoints separated. Full server-side role check requires JWT/Session token filter.
+                        .requestMatchers("/api/users/**", "/api/products/**", "/api/categories/**").permitAll()
                         .anyRequest().permitAll());
 
         return http.build();

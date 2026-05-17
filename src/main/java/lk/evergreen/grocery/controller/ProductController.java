@@ -35,21 +35,5 @@ public class ProductController {
         return productService.search(q);
     }
 
-    @PostMapping
-    public ResponseEntity<Product> create(@RequestBody ProductRequest body) {
-        Product saved = productService.create(body);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody ProductRequest body) {
-        Product saved = productService.update(id, body);
-        return ResponseEntity.ok(saved);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        productService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
 }
+
