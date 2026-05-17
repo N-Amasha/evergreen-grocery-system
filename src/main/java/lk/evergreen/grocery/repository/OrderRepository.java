@@ -26,4 +26,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT COUNT(o) FROM Order o WHERE o.status = lk.evergreen.grocery.entity.OrderStatus.SHIPPED")
     long countActiveDeliveries();
+
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.user.id = :userId")
+    long countOrdersByUser(@Param("userId") Long userId);
+
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.user.id = :userId AND o.status != lk.evergreen.grocery.entity.OrderStatus.CANCELLED")
+    BigDecimal sumSpentByUser(@Param("userId") Long userId);
 }

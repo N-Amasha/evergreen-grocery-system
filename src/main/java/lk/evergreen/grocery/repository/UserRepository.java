@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByEmail(String email);
+
+    java.util.List<User> findByRole(lk.evergreen.grocery.entity.UserRole role);
 }
