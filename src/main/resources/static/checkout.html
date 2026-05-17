@@ -128,7 +128,10 @@
                 </div>
                 <h4 class="fw-bold">Order Placed!</h4>
                 <p class="text-white-50 mb-4">Your fresh groceries are on their way!</p>
-                <a href="index.html" class="btn btn-glass-pill">Back to Home</a>
+                <a href="javascript:void(0)" id="downloadPdfBtn" class="btn btn-glass-pill mb-2 w-100 py-2" style="display: none;">
+                    <i class="bi bi-download me-2"></i>Download PDF Invoice
+                </a>
+                <a href="index.html" class="btn btn-outline-light rounded-pill w-100 py-2">Back to Home</a>
             </div>
         </div>
     </div>
@@ -390,7 +393,7 @@
         // ==========================================
         // 3. STRIPE INITIALIZATION
         // ==========================================
-        const stripe = Stripe('YOUR_STRIPE_PUBLISHABLE_KEY'); // PLACEHOLDER
+        const stripe = Stripe('pk_test_51TXNvbCQaL6ApduWBW5AKSRepxwQcpUHxEFAZxLqL6PUH0Its8OjiwSArpN0hNxOJtscuinek9IvvQePLOY5k4ad005FWQESDp'); // PLACEHOLDER
         const elements = stripe.elements();
 
         // Custom styling for Stripe Element
@@ -484,6 +487,13 @@
                 } else {
                     // The payment has been processed!
                     if (result.paymentIntent.status === 'succeeded') {
+                        // Display and link PDF Download button on the success modal
+                        const pdfBtn = document.getElementById('downloadPdfBtn');
+                        pdfBtn.style.display = 'inline-block';
+                        pdfBtn.onclick = () => {
+                            window.location.href = `/api/orders/${orderData.id}/pdf`;
+                        };
+                        
                         new bootstrap.Modal(document.getElementById('successModal')).show();
                     }
                 }
