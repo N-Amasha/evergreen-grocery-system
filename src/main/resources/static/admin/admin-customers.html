@@ -6,7 +6,7 @@
     <title>Customers | EverGreen Intelligence</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="auth-page">
 
@@ -59,30 +59,8 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="profile-avatar-sm bg-accent rounded-circle" style="width: 35px; height: 35px;"></div>
-                            <div>
-                                <div class="fw-bold">Amantha Perera</div>
-                                <div class="x-small opacity-50">amantha.p@example.com</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="category-pill">EverGreen+</span></td>
-                    <td>Rs. 12,450</td>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="text-accent">92/100</span>
-                            <div class="progress w-100" style="height: 4px; width: 50px !important;">
-                                <div class="progress-bar bg-accent" style="width: 92%"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>6.2 / mo</td>
-                    <td><button class="btn-add-cart"><i class="bi bi-eye"></i></button></td>
-                </tr>
+            <tbody id="customersTableBody">
+                <!-- Dynamically Loaded -->
             </tbody>
         </table>
     </div>
@@ -98,6 +76,77 @@
                 alert("Access Denied! You do not have administrator privileges.");
                 window.location.href = '../index.html';
             }
+        }
+
+        // Dynamic Customers Loading
+        document.addEventListener("DOMContentLoaded", () => {
+            loadCustomers();
+        });
+
+        function loadCustomers() {
+            const tbody = document.getElementById("customersTableBody");
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4"><span class="spinner-border spinner-border-sm text-accent me-2"></span>Loading customers...</td></tr>`;
+
+            fetch("/api/admin/customers")
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to load customers");
+                    return res.json();
+                })
+                .then(customers => {
+                    tbody.innerHTML = "";
+                    if (customers.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 opacity-50">No shoppers registered in the database.</td></tr>`;
+                        return;
+                    }
+
+                    customers.forEach(c => {
+                        const isPremium = c.totalSpent > 5000;
+                        const membershipLabel = isPremium ? 'EverGreen+' : 'Standard';
+                        const membershipClass = isPremium ? 'bg-accent text-dark' : 'border border-white-10 text-white';
+
+                        const ecoScore = Math.min(100, Math.round((c.totalSpent / 200) + 10));
+
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="profile-avatar-sm bg-accent rounded-circle d-flex align-items-center justify-content-center fw-bold text-dark" style="width: 35px; height: 35px; font-size: 0.85rem;">
+                                        ${c.name ? c.name.charAt(0).toUpperCase() : 'U'}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">${escapeHtml(c.name)}</div>
+                                        <div class="x-small opacity-50">${escapeHtml(c.email)}</div>
+                                        <div class="x-small opacity-50">${escapeHtml(c.phone || 'No phone')}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge ${membershipClass}">${membershipLabel}</span></td>
+                            <td><span class="product-price" style="font-size: 0.95rem;"><span class="currency">Rs.</span> ${c.totalSpent.toFixed(2)}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-accent">${ecoScore}/100</span>
+                                    <div class="progress w-100" style="height: 4px; width: 60px !important;">
+                                        <div class="progress-bar bg-accent" style="width: ${ecoScore}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${c.totalOrders} Orders</td>
+                            <td>
+                                <a href="admin-orders.html" class="btn-add-cart py-1 px-2 d-inline-block text-center" style="line-height: normal;"><i class="bi bi-eye"></i></a>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(err => {
+                    console.error("Error loading customers:", err);
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Error loading customers: ${err.message}</td></tr>`;
+                });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
     </script>
 </body>
