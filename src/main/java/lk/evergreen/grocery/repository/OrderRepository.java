@@ -24,6 +24,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.orderDate >= :startDate AND o.status != lk.evergreen.grocery.entity.OrderStatus.CANCELLED")
     BigDecimal calculateRevenueSince(@Param("startDate") LocalDateTime startDate);
 
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.status = lk.evergreen.grocery.entity.OrderStatus.CANCELLED")
+    BigDecimal sumCancelledRevenue();
+
     @Query("SELECT COUNT(o) FROM Order o WHERE o.status IN (lk.evergreen.grocery.entity.OrderStatus.PENDING, lk.evergreen.grocery.entity.OrderStatus.CONFIRMED, lk.evergreen.grocery.entity.OrderStatus.SHIPPED)")
     long countActiveOrders();
 
