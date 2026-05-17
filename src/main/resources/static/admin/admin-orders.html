@@ -6,7 +6,7 @@
     <title>Orders | EverGreen Intelligence</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="auth-page">
 
@@ -63,47 +63,15 @@
                                 <th>Logistics</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- Order with Weight Logic -->
-                            <tr>
-                                <td><span class="fw-bold">#EVG-1024</span></td>
-                                <td>
-                                    <div class="fw-bold">Amantha Perera</div>
-                                    <div class="x-small opacity-50">Kandy, Central Province</div>
-                                </td>
-                                <td>
-                                    <div class="order-items-preview">
-                                        <span class="item-thumb">Avocado (1.2kg)</span>
-                                        <span class="item-thumb">King Coconut x2</span>
-                                    </div>
-                                </td>
-                                <td><span class="product-price" style="font-size: 1rem;"><span class="currency">Rs.</span> 2,450</span></td>
-                                <td><span class="badge border border-accent text-accent">Weight Pending</span></td>
-                                <td>
-                                    <button class="btn-glass-pill py-1 px-3" style="font-size: 0.75rem;">Verify & Pack</button>
-                                </td>
-                            </tr>
-                            <!-- Standard Order -->
-                            <tr>
-                                <td><span class="fw-bold">#EVG-1023</span></td>
-                                <td>
-                                    <div class="fw-bold">Nethmi Amasha</div>
-                                    <div class="x-small opacity-50">Malabe, SLIIT Campus</div>
-                                </td>
-                                <td>
-                                    <div class="order-items-preview">
-                                        <span class="item-thumb">Organic Tea x1</span>
-                                    </div>
-                                </td>
-                                <td><span class="product-price" style="font-size: 1rem;"><span class="currency">Rs.</span> 850</span></td>
-                                <td><span class="badge bg-accent text-dark">Processing</span></td>
-                                <td>
-                                    <button class="btn-add-cart"><i class="bi bi-truck"></i></button>
-                                </td>
-                            </tr>
+                        <tbody id="ordersTableBody">
+                            <!-- Dynamically loaded -->
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </main>
+    </div>
+
     <script>
         // Client-side Guard: Only allow logged-in Admins to access this panel
         const userJson = localStorage.getItem('loggedInUser');
@@ -116,6 +84,102 @@
                 alert("Access Denied! You do not have administrator privileges.");
                 window.location.href = '../index.html';
             }
+        }
+
+        // Dynamic Orders Loading and Status Management
+        document.addEventListener("DOMContentLoaded", () => {
+            loadOrders();
+        });
+
+        function loadOrders() {
+            const tbody = document.getElementById("ordersTableBody");
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4"><span class="spinner-border spinner-border-sm text-accent me-2"></span>Loading orders...</td></tr>`;
+
+            fetch("/api/admin/orders")
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to load orders");
+                    return res.json();
+                })
+                .then(orders => {
+                    tbody.innerHTML = "";
+                    if (orders.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 opacity-50">No orders found in the database.</td></tr>`;
+                        return;
+                    }
+
+                    orders.forEach(order => {
+                        const itemsPreview = order.items ? order.items.map(item => `
+                            <span class="item-thumb">${escapeHtml(item.productName)} x ${item.quantity}</span>
+                        `).join('') : '';
+
+                        const statusOptions = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map(s => `
+                            <option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>
+                        `).join('');
+
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><span class="fw-bold">#EVG-${order.id}</span></td>
+                            <td>
+                                <div class="fw-bold">${order.customer ? escapeHtml(order.customer.name) : 'Guest'}</div>
+                                <div class="x-small opacity-50">${order.shippingAddress ? escapeHtml(order.shippingAddress.streetAddress) : 'No Address'}</div>
+                                <div class="x-small opacity-50">${order.customer && order.customer.phone ? escapeHtml(order.customer.phone) : ''}</div>
+                            </td>
+                            <td>
+                                <div class="order-items-preview">
+                                    ${itemsPreview}
+                                </div>
+                            </td>
+                            <td><span class="product-price" style="font-size: 1rem;"><span class="currency">Rs.</span> ${order.totalAmount.toFixed(2)}</span></td>
+                            <td><span class="badge ${getStatusBadgeClass(order.status)}">${order.status}</span></td>
+                            <td>
+                                <select class="form-select auth-input py-1 px-2" style="font-size: 0.75rem; background-color: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.15);" onchange="updateOrderStatus(${order.id}, this.value)">
+                                    ${statusOptions}
+                                </select>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Error loading orders: ${err.message}</td></tr>`;
+                });
+        }
+
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'PENDING': return 'bg-warning text-dark';
+                case 'CONFIRMED': return 'bg-info text-dark';
+                case 'SHIPPED': return 'bg-primary text-white';
+                case 'DELIVERED': return 'bg-success text-white';
+                case 'CANCELLED': return 'bg-danger text-white';
+                default: return 'bg-secondary text-white';
+            }
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            fetch(`/api/admin/orders/${orderId}/status`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to update status");
+                return res.json();
+            })
+            .then(updated => {
+                loadOrders(); // Refresh table
+            })
+            .catch(err => {
+                alert("Error updating order status: " + err.message);
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
     </script>
 </body>
