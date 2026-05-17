@@ -18,6 +18,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT DISTINCT o FROM Order o JOIN FETCH o.user LEFT JOIN FETCH o.shippingAddress LEFT JOIN FETCH o.items i LEFT JOIN FETCH i.product ORDER BY o.orderDate DESC")
     List<Order> findAllWithUserAndItemsAndAddress();
 
+    @Query("SELECT DISTINCT o FROM Order o JOIN FETCH o.user LEFT JOIN FETCH o.shippingAddress LEFT JOIN FETCH o.items i LEFT JOIN FETCH i.product WHERE o.status = :status ORDER BY o.orderDate DESC")
+    List<Order> findByStatusWithUserAndItemsAndAddress(@Param("status") lk.evergreen.grocery.entity.OrderStatus status);
+
     @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.orderDate >= :startDate AND o.status != lk.evergreen.grocery.entity.OrderStatus.CANCELLED")
     BigDecimal calculateRevenueSince(@Param("startDate") LocalDateTime startDate);
 

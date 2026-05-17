@@ -43,7 +43,7 @@ public class AdminOrderService {
         return convertToDTO(updated);
     }
 
-    private OrderResponseDTO convertToDTO(Order order) {
+    public OrderResponseDTO convertToDTO(Order order) {
         OrderResponseDTO dto = new OrderResponseDTO();
         dto.setId(order.getId());
         dto.setOrderDate(order.getOrderDate());

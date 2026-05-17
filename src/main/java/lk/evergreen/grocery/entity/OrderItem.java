@@ -35,4 +35,10 @@ public class OrderItem {
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price; // Captured price at the time of order
+
+    @Column(name = "actual_weight", precision = 6, scale = 3)
+    private BigDecimal actualWeight;
+
+    @Column(name = "weighed", nullable = false)
+    private boolean weighed = false;
 }
