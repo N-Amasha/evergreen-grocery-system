@@ -149,100 +149,104 @@
 </head>
 <body>
 
-    <!-- Header Block -->
-    <table class="header-table" cellpadding="0" cellspacing="0">
-        <tr>
-            <td>
-                <div class="logo-text">Ever<span class="logo-accent">Green</span></div>
-            </td>
-            <td>
-                <div class="invoice-title">OFFICIAL INVOICE</div>
-            </td>
-        </tr>
-    </table>
+<!-- Header Block -->
+<table class="header-table" cellpadding="0" cellspacing="0">
+    <tr>
+        <td>
+            <div class="logo-text">Ever<span class="logo-accent">Green</span></div>
+        </td>
+        <td>
+            <div class="invoice-title">OFFICIAL INVOICE</div>
+        </td>
+    </tr>
+</table>
 
-    <!-- Info Block (Billing & Details) -->
-    <table class="info-table" cellpadding="0" cellspacing="0">
-        <tr>
-            <td class="info-col">
-                <div class="info-header">Invoiced To</div>
-                <div class="info-value" th:text="${order.shippingAddress != null ? order.shippingAddress.fullName : order.user.name}">Recipient Name</div>
-                <div class="info-subtext" th:text="${order.shippingAddress != null ? order.shippingAddress.streetAddress : 'No address provided'}">Street Address</div>
-                <div class="info-subtext" th:if="${order.shippingAddress != null and order.shippingAddress.phone != null}" th:text="'Phone: ' + ${order.shippingAddress.phone}">Phone</div>
-            </td>
-            <td class="info-col" style="padding-left: 20px;">
-                <div class="info-header">Order Information</div>
+<!-- Info Block (Billing & Details) -->
+<table class="info-table" cellpadding="0" cellspacing="0">
+    <tr>
+        <td class="info-col">
+            <div class="info-header">Invoiced To</div>
+            <div class="info-value" th:text="${order.shippingAddress != null ? order.shippingAddress.fullName : order.user.name}">Recipient Name</div>
+            <div class="info-subtext" th:text="${order.shippingAddress != null ? order.shippingAddress.streetAddress : 'No address provided'}">Street Address</div>
+            <div class="info-subtext" th:if="${order.shippingAddress != null and order.shippingAddress.phone != null}" th:text="'Phone: ' + ${order.shippingAddress.phone}">Phone</div>
+        </td>
+        <td class="info-col" style="padding-left: 20px;">
+            <div class="info-header">Order Information</div>
+            <table cellpadding="0" cellspacing="0" style="width: 100%;">
+                <tr>
+                    <td style="color: #6c757d; padding-bottom: 4px;">Invoice Number:</td>
+                    <td class="text-end" style="font-weight: bold; padding-bottom: 4px;" th:text="'#EG-' + ${order.id}">#EG-1000</td>
+                </tr>
+                <tr>
+                    <td style="color: #6c757d; padding-bottom: 4px;">Order Date:</td>
+                    <td class="text-end" style="padding-bottom: 4px;" th:text="${#temporals.format(order.orderDate, 'MMMM dd, yyyy - hh:mm a')}">Date</td>
+                </tr>
+                <tr>
+                    <td style="color: #6c757d; padding-bottom: 4px;">Payment Method:</td>
+                    <td class="text-end" style="text-transform: uppercase; padding-bottom: 4px;" th:text="${order.paymentMethod != null ? order.paymentMethod : 'N/A'}">Cash</td>
+                </tr>
+                <tr>
+                    <td style="color: #6c757d;">Delivery:</td>
+                    <td class="text-end" th:text="${order.deliveryType == 'SCHEDULED' ? (order.scheduledDate + ' | ' + order.scheduledTimeSlot) : 'Standard Delivery (Today, 5 PM - 8 PM)'}">Standard Delivery</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<!-- Items Block -->
+<table class="items-table" cellpadding="0" cellspacing="0">
+    <thead>
+    <tr>
+        <th style="width: 50%;">Item Description</th>
+        <th class="text-center" style="width: 15%;">Quantity</th>
+        <th class="text-end" style="width: 15%;">Unit Price</th>
+        <th class="text-end" style="width: 20%;">Total Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${order.items}">
+        <td th:text="${item.product.name}">Fresh Spinach</td>
+        <td class="text-center" th:text="${item.quantity}">2</td>
+        <td class="text-end" th:text="'Rs. ' + ${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}">Rs. 250.00</td>
+        <td class="text-end" th:text="'Rs. ' + ${#numbers.formatDecimal(item.price * item.quantity, 1, 'COMMA', 2, 'POINT')}">Rs. 500.00</td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Summary Block -->
+<table class="summary-wrapper-table" cellpadding="0" cellspacing="0">
+    <tr>
+        <td class="summary-col-left">
+            <!-- Empty left column to push summary right -->
+        </td>
+        <td class="summary-col-right">
+            <div class="summary-card">
                 <table cellpadding="0" cellspacing="0" style="width: 100%;">
                     <tr>
-                        <td style="color: #6c757d; padding-bottom: 4px;">Invoice Number:</td>
-                        <td class="text-end" style="font-weight: bold; padding-bottom: 4px;" th:text="'#EG-' + ${order.id}">#EG-1000</td>
+                        <td class="summary-label">Subtotal:</td>
+                        <td class="summary-value" th:text="'Rs. ' + ${#numbers.formatDecimal(order.totalAmount > 250 ? order.totalAmount - 250 : order.totalAmount, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</td>
                     </tr>
-                    <tr>
-                        <td style="color: #6c757d; padding-bottom: 4px;">Order Date:</td>
-                        <td class="text-end" style="padding-bottom: 4px;" th:text="${#temporals.format(order.orderDate, 'MMMM dd, yyyy - hh:mm a')}">Date</td>
+                    <tr style="margin-top: 8px;">
+                        <td class="summary-label" style="padding-top: 8px;">Delivery Charge:</td>
+                        <td class="summary-value" style="padding-top: 8px;" th:text="${order.totalAmount > 250 ? 'Rs. 250.00' : 'Free'}">Rs. 250.00</td>
                     </tr>
-                    <tr>
-                        <td style="color: #6c757d;">Payment Method:</td>
-                        <td class="text-end" style="text-transform: uppercase;" th:text="${order.paymentMethod != null ? order.paymentMethod : 'N/A'}">Cash</td>
+                    <tr class="total-row">
+                        <td class="total-label" style="padding-top: 10px;">Total Amount:</td>
+                        <td class="total-value" style="padding-top: 10px;" th:text="'Rs. ' + ${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</td>
                     </tr>
                 </table>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </td>
+    </tr>
+</table>
 
-    <!-- Items Block -->
-    <table class="items-table" cellpadding="0" cellspacing="0">
-        <thead>
-            <tr>
-                <th style="width: 50%;">Item Description</th>
-                <th class="text-center" style="width: 15%;">Quantity</th>
-                <th class="text-end" style="width: 15%;">Unit Price</th>
-                <th class="text-end" style="width: 20%;">Total Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="item : ${order.items}">
-                <td th:text="${item.product.name}">Fresh Spinach</td>
-                <td class="text-center" th:text="${item.quantity}">2</td>
-                <td class="text-end" th:text="'Rs. ' + ${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}">Rs. 250.00</td>
-                <td class="text-end" th:text="'Rs. ' + ${#numbers.formatDecimal(item.price * item.quantity, 1, 'COMMA', 2, 'POINT')}">Rs. 500.00</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- Summary Block -->
-    <table class="summary-wrapper-table" cellpadding="0" cellspacing="0">
-        <tr>
-            <td class="summary-col-left">
-                <!-- Empty left column to push summary right -->
-            </td>
-            <td class="summary-col-right">
-                <div class="summary-card">
-                    <table cellpadding="0" cellspacing="0" style="width: 100%;">
-                        <tr>
-                            <td class="summary-label">Subtotal:</td>
-                            <td class="summary-value" th:text="'Rs. ' + ${#numbers.formatDecimal(order.totalAmount > 250 ? order.totalAmount - 250 : order.totalAmount, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</td>
-                        </tr>
-                        <tr style="margin-top: 8px;">
-                            <td class="summary-label" style="padding-top: 8px;">Delivery Charge:</td>
-                            <td class="summary-value" style="padding-top: 8px;" th:text="${order.totalAmount > 250 ? 'Rs. 250.00' : 'Free'}">Rs. 250.00</td>
-                        </tr>
-                        <tr class="total-row">
-                            <td class="total-label" style="padding-top: 10px;">Total Amount:</td>
-                            <td class="total-value" style="padding-top: 10px;" th:text="'Rs. ' + ${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</td>
-                        </tr>
-                    </table>
-                </div>
-            </td>
-        </tr>
-    </table>
-
-    <!-- Footer Note -->
-    <div class="footer-note">
-        Thank you for shopping with <strong>EverGreen</strong>!<br />
-        This is a system-generated invoice and does not require a physical signature.<br />
-        For any support, please contact us at support@evergreen.lk or +94 11 234 5678.
-    </div>
+<!-- Footer Note -->
+<div class="footer-note">
+    Thank you for shopping with <strong>EverGreen</strong>!<br />
+    This is a system-generated invoice and does not require a physical signature.<br />
+    For any support, please contact us at support@evergreen.lk or +94 11 234 5678.
+</div>
 
 </body>
 </html>

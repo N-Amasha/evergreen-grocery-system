@@ -47,6 +47,15 @@ public class Order {
     @Column(name = "courier_name")
     private String courierName;
 
+    @Column(name = "delivery_type", nullable = false, length = 32)
+    private String deliveryType = "STANDARD";
+
+    @Column(name = "scheduled_date")
+    private java.time.LocalDate scheduledDate;
+
+    @Column(name = "scheduled_time_slot", length = 64)
+    private String scheduledTimeSlot;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 

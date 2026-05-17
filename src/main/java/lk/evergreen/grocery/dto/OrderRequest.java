@@ -11,4 +11,7 @@ public class OrderRequest {
     private Long userId;
     private Long addressId;
     private String paymentMethod; // e.g. "STRIPE" or "COD"
+    private String deliveryType;
+    private String scheduledDate;
+    private String scheduledTimeSlot;
 }

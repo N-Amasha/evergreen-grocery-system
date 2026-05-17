@@ -57,6 +57,11 @@ public class OrderService {
         order.setTotalAmount(total);
         order.setPaymentMethod(request.getPaymentMethod());
         order.setStatus(OrderStatus.PENDING);
+        order.setDeliveryType(request.getDeliveryType() != null ? request.getDeliveryType() : "STANDARD");
+        if (request.getScheduledDate() != null && !request.getScheduledDate().isEmpty()) {
+            order.setScheduledDate(java.time.LocalDate.parse(request.getScheduledDate()));
+        }
+        order.setScheduledTimeSlot(request.getScheduledTimeSlot());
 
         Order savedOrder = orderRepository.save(order);
 
