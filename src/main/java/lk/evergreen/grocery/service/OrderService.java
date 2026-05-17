@@ -91,4 +91,9 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return orderRepository.findByUserOrderByOrderDateDesc(user);
     }
+
+    public Order getOrderById(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+    }
 }

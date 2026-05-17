@@ -3,8 +3,9 @@ package lk.evergreen.grocery.controller;
 import lk.evergreen.grocery.dto.OrderRequest;
 import lk.evergreen.grocery.entity.Order;
 import lk.evergreen.grocery.service.OrderService;
+import lk.evergreen.grocery.service.PdfService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,6 +14,9 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private PdfService pdfService;
 
     @PostMapping("/place")
     public ResponseEntity<?> placeOrder(@RequestBody OrderRequest orderRequest) {
@@ -30,6 +34,23 @@ public class OrderController {
             return ResponseEntity.ok(orderService.getOrdersByUser(userId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/{id}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> downloadInvoice(@PathVariable Long id) {
+        try {
+            Order order = orderService.getOrderById(id);
+            byte[] pdfBytes = pdfService.generateInvoicePdf(order);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                    .filename("Invoice_EG-" + id + ".pdf").build());
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

@@ -84,6 +84,13 @@
             <artifactId>stripe-java</artifactId>
             <version>28.3.0</version>
         </dependency>
+
+        <!-- Flying Saucer PDF Generator -->
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf-openpdf</artifactId>
+            <version>9.1.22</version>
+        </dependency>
     </dependencies>
 
     <build>
