@@ -126,8 +126,19 @@
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
-
+    <script>
+        // Client-side Guard: Only allow logged-in Admins to access this panel
+        const userJson = localStorage.getItem('loggedInUser');
+        if (!userJson) {
+            alert("Access Denied! Please sign in first.");
+            window.location.href = '../login.html';
+        } else {
+            const user = JSON.parse(userJson);
+            if (user.role !== 'ADMIN') {
+                alert("Access Denied! You do not have administrator privileges.");
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
 </body>
 </html>
